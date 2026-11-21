@@ -1,0 +1,22 @@
+/* code sheets, the mail pop-up and announcements: always in the middle, never under the keyboard */
+.pc, .ann{ top:var(--vvt, 0px) !important; bottom:auto !important; height:var(--vvh, 100dvh) !important; }
+.pc{ align-items:center !important; padding:16px !important; }
+.pc-card{ border-radius:24px !important; max-height:calc(var(--vvh, 100dvh) - 32px); overflow-y:auto; overscroll-behavior:contain;
+  transform:translateY(14px) scale(.98); }
+.pc.is-open .pc-card{ transform:none; }
+.ann{ align-items:center !important; place-items:center !important; }
+.ann-card{ max-height:calc(var(--vvh, 100dvh) - 28px) !important; }
+@media (max-width:480px){
+  .pc{ padding:12px !important; }
+  .pc-card{ padding:26px 18px 20px; }
+  .ann{ padding:12px !important; }
+}
+/* small screens with the keyboard open: tighter top part so the code boxes stay visible */
+@media (max-height:560px){
+  .pc-mark{ width:48px !important; height:48px !important; margin-bottom:10px !important; border-radius:16px !important; }
+  .pc-mark svg{ width:22px !important; height:22px !important; }
+  .pc h3{ font-size:19px !important; }
+  .pc-lead{ font-size:13px !important; }
+  .pc-safe{ display:none !important; }
+  .pc-ways{ margin-top:8px !important; }
+}

@@ -1,0 +1,73 @@
+/* =====================================================================
+   Survey page v27: text-first task rows. No pictures and no web fonts
+   (the .svx scope keeps the device font). Only the site's own colours:
+   quiet dark surfaces, white for actions, green for money, amber for waiting.
+   ===================================================================== */
+.svx .svx-grid{ grid-template-columns:minmax(0,1fr); gap:10px; }
+.svx-label{ margin:18px 4px 0; }
+
+/* ---------- one task ---------- */
+.svx-card{ display:block; padding:0; border-radius:18px; background:var(--surface); box-shadow:inset 0 0 0 1px var(--svx-hair); }
+.svx-card.is-open:active{ transform:none; }
+@media (hover:hover){
+  .svx-card.is-open:hover{ transform:none; background:linear-gradient(0deg, rgba(244,243,238,.022), rgba(244,243,238,.022)), var(--surface); box-shadow:inset 0 0 0 1px var(--svx-hair-2); }
+}
+.svx-row{ display:grid; grid-template-columns:44px minmax(0,1fr); grid-template-areas:"ico body" "tray tray"; gap:14px; padding:16px; }
+.svx-ico{ grid-area:ico; display:grid; place-items:center; width:44px; height:44px; border-radius:13px; background:var(--surface-2); color:var(--ink); box-shadow:inset 0 0 0 1px var(--svx-hair); }
+.svx-ico .icon-glyph{ width:20px; height:20px; }
+.svx-card.is-done .svx-ico{ color:var(--muted); }
+.svx-card .svx-body{ grid-area:body; gap:6px; padding:0; }
+.svx-card .svx-meta{ flex-wrap:wrap; row-gap:6px; }
+.svx-pill{ display:inline-flex; align-items:center; gap:6px; height:22px; padding:0 9px; border-radius:999px; font-size:11px; font-weight:700; letter-spacing:.02em; white-space:nowrap; }
+.svx-pill.is-new{ background:var(--ink); color:var(--bg, #0C0D0C); }
+.svx-pill.is-limited{ background:var(--warn-soft); color:var(--warn); }
+.svx-pill.is-limited i{ width:6px; height:6px; border-radius:50%; background:currentColor; }
+.svx .svx-card .svx-title{ font-size:16px; line-height:1.35; -webkit-line-clamp:2; }
+.svx-card .svx-desc{ font-size:13.5px; -webkit-line-clamp:2; }
+.svx-card .svx-tray{ grid-area:tray; margin:0; padding:10px 10px 10px 14px; border-radius:14px; background:var(--surface-2); }
+.svx-card .svx-go{ height:40px; border-radius:11px; }
+.svx-card .svx-review, .svx-card .svx-reason{ margin:0 16px 16px; }
+@container svx (min-width:640px){
+  .svx-row{ grid-template-columns:44px minmax(0,1fr) auto; grid-template-areas:"ico body tray"; align-items:center; gap:18px; padding:18px 18px 18px 20px; }
+  .svx-card .svx-tray{ gap:20px; padding:0; background:none; }
+  .svx-card .svx-earn{ text-align:right; }
+  .svx-card .svx-review, .svx-card .svx-reason{ margin:-4px 18px 18px 82px; }
+}
+
+/* ---------- the newest open task, shown bigger ---------- */
+.svx-card.is-featured{ background:linear-gradient(180deg, rgba(244,243,238,.03), rgba(244,243,238,0) 55%), var(--surface); }
+.svx-feat{ display:grid; grid-template-columns:minmax(0,1fr); gap:16px; padding:18px; }
+.svx-feat-main{ display:flex; flex-direction:column; gap:10px; min-width:0; }
+.svx-feat-top{ display:flex; align-items:center; gap:12px; }
+.svx .svx-card.is-featured .svx-title{ font-size:22px; line-height:1.22; letter-spacing:-.022em; -webkit-line-clamp:3; }
+.svx-card.is-featured .svx-desc{ font-size:14px; -webkit-line-clamp:4; }
+.svx-facts{ display:grid; grid-template-columns:repeat(auto-fit, minmax(110px, 1fr)); margin:6px 0 0; padding:0; list-style:none; border-radius:14px; box-shadow:inset 0 0 0 1px var(--svx-hair); }
+.svx-facts li{ position:relative; min-width:0; padding:11px 14px 12px; }
+.svx-facts li + li::before{ content:""; position:absolute; left:0; top:12px; bottom:12px; width:1px; background:var(--svx-hair); }
+.svx-facts small{ display:block; font-size:11px; color:var(--muted); }
+.svx-facts b{ display:block; margin-top:3px; font-size:13.5px; font-weight:650; color:var(--ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.svx-feat-side{ display:flex; flex-direction:column; justify-content:space-between; gap:16px; padding:16px; border-radius:16px; background:var(--surface-2); }
+.svx-feat-side .svx-earn span{ display:block; }
+.svx-feat-side .svx-earn b{ margin-top:6px; font-size:30px; }
+.svx-feat-side p{ margin:8px 0 0; font-size:12.5px; line-height:1.5; color:var(--muted); }
+.svx-feat-side .svx-go{ width:100%; justify-content:center; height:46px; }
+.svx-feat-side .svx-capped{ justify-content:center; }
+@container svx (min-width:640px){
+  .svx-card.is-featured{ display:block; }
+  .svx-feat{ grid-template-columns:minmax(0,1fr) 260px; gap:24px; padding:24px 24px 24px 26px; }
+  .svx-card.is-featured .svx-earn{ text-align:left; }
+  .svx .svx-card.is-featured .svx-title{ font-size:clamp(22px, 3cqi, 27px); }
+}
+
+/* ---------- loading rows ---------- */
+.svx-card.is-skel .svx-ico{ background:none; box-shadow:none; overflow:hidden; }
+.svx-card.is-skel .svx-ico .svx-shim{ width:100%; height:100%; border-radius:inherit; }
+
+/* ---------- the task sheet: a plain header instead of a picture ---------- */
+.svx-sheet-top{ display:flex; align-items:center; gap:12px; padding:22px 22px 0; }
+.svx-sheet-top .svx-ico{ width:48px; height:48px; border-radius:14px; }
+.svx-sheet-top .svx-ico .icon-glyph{ width:22px; height:22px; }
+.svx-sheet-flags{ display:flex; flex-wrap:wrap; gap:6px; flex:1; min-width:0; }
+.svx .svx-sheet-top .svx-x{ position:static; flex:none; margin-left:auto; background:var(--surface-2); box-shadow:none; }
+.svx .svx-sheet-top .svx-x:hover{ background:var(--surface-3); }
+.svx-sheet-top + .svx-sheet-body{ padding-top:16px; }

@@ -1,0 +1,135 @@
+/* =====================================================================
+   Payments v2: withdraw timing + taka calculator, email code sheet,
+   2% transfer fee preview, survey review timing and reasons.
+   The device's own font only (no web fonts) in all of these areas.
+   ===================================================================== */
+:root{ --srv-plain:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif; --srv-ease:cubic-bezier(.2,.8,.2,1); }
+#page-withdraw, #page-withdraw *, .cfm, .cfm *, .pc, .pc *, .tfx-card, .tfx-card *{ font-family:var(--srv-plain) !important; }
+
+/* ---------- withdraw: method cards show the arrival time ---------- */
+.wd-eta{ display:inline-flex; align-items:center; gap:6px; margin-top:8px; width:max-content; padding:4px 9px; border-radius:999px;
+  background:rgba(244,243,238,.06); color:var(--text); font-style:normal; font-size:12px; font-weight:600; }
+.wd-eta svg{ width:12px; height:12px; }
+#wd-method-toggle .withdraw-method.active .wd-eta{ background:var(--btn); color:var(--btn-ink); }
+
+/* timing + rules panel under the methods */
+.wdx-info{ display:grid; gap:10px; margin-top:14px; }
+.wdx-eta{ position:relative; overflow:hidden; display:flex; align-items:center; gap:14px; padding:16px 18px; border-radius:18px;
+  background:radial-gradient(120% 160% at 0% 0%, rgba(244,243,238,.07), rgba(244,243,238,0) 60%), var(--surface-2); box-shadow:inset 0 0 0 1px rgba(244,243,238,.06); }
+.wdx-eta-ico{ flex:none; display:grid; place-items:center; width:46px; height:46px; border-radius:15px; background:var(--surface-3); color:var(--ink);
+  box-shadow:inset 0 0 0 1px rgba(244,243,238,.08); }
+.wdx-eta-ico svg{ width:21px; height:21px; }
+.wdx-eta small{ display:block; font-size:10.5px; font-weight:700; letter-spacing:.11em; text-transform:uppercase; color:var(--muted); }
+.wdx-eta b{ display:block; margin-top:4px; font-size:21px; line-height:1.1; font-weight:750; letter-spacing:-.02em; color:var(--ink); }
+.wdx-eta p{ margin:5px 0 0; font-size:13px; line-height:1.5; color:var(--muted); }
+.wdx-warn{ display:flex; gap:12px; padding:14px 16px; border-radius:16px; background:linear-gradient(180deg, rgba(224,178,90,.12), rgba(224,178,90,.07));
+  box-shadow:inset 0 0 0 1px rgba(224,178,90,.18); color:#EBCB86; }
+.wdx-warn-ico{ flex:none; display:grid; place-items:center; width:30px; height:30px; border-radius:10px; background:rgba(224,178,90,.18); color:var(--warn); }
+.wdx-warn-ico svg{ width:16px; height:16px; }
+.wdx-warn b{ display:block; font-size:14px; font-weight:700; color:#F3D99E; }
+.wdx-warn p{ margin:3px 0 0; font-size:13px; line-height:1.5; color:rgba(235,203,134,.85); }
+
+/* live bKash rate under the amount */
+.wdx-rate{ display:flex; align-items:center; flex-wrap:wrap; gap:8px; margin:12px 0 0; font-size:13px; color:var(--muted); }
+.wdx-rate[hidden]{ display:none; }
+.wdx-rate b{ color:var(--ink); font-weight:700; }
+.wdx-live{ display:inline-flex; align-items:center; gap:6px; padding:3px 8px; border-radius:999px; background:var(--ok-soft); color:var(--ok); font-size:11.5px; font-weight:700; }
+.wdx-live i{ width:6px; height:6px; border-radius:50%; background:currentColor; animation:wdxPulse 2s ease-in-out infinite; }
+
+/* taka you get (summary) */
+.wdx-taka{ margin-top:16px; padding:16px 16px 15px; border-radius:18px; background:radial-gradient(130% 170% at 0% 0%, rgba(76,195,138,.15), rgba(76,195,138,0) 60%), var(--surface-3); }
+.wdx-taka[hidden]{ display:none; }
+.wdx-taka small{ display:block; font-size:10.5px; font-weight:700; letter-spacing:.11em; text-transform:uppercase; color:var(--muted); }
+.wdx-taka b{ display:block; margin-top:6px; font-size:32px; line-height:1; font-weight:800; letter-spacing:-.03em; color:var(--ok); font-variant-numeric:tabular-nums; }
+.wdx-taka p{ margin:8px 0 0; font-size:12.5px; line-height:1.5; color:var(--muted); }
+
+/* a withdrawal is already on its way */
+.wdx-pending{ display:flex; align-items:center; gap:14px; margin:0 0 22px; padding:16px 18px; border-radius:18px;
+  background:radial-gradient(120% 160% at 0% 0%, rgba(224,178,90,.16), rgba(224,178,90,0) 60%), var(--surface-2); box-shadow:inset 0 0 0 1px rgba(224,178,90,.2); }
+.wdx-pending[hidden]{ display:none; }
+.wdx-pending-ico{ position:relative; flex:none; display:grid; place-items:center; width:46px; height:46px; border-radius:15px; background:rgba(224,178,90,.16); color:var(--warn); }
+.wdx-pending-ico svg{ width:21px; height:21px; }
+.wdx-pending-ico::after{ content:""; position:absolute; inset:-4px; border-radius:18px; box-shadow:0 0 0 1px rgba(224,178,90,.35); animation:wdxRing 2.4s ease-out infinite; }
+.wdx-pending b{ display:block; font-size:15px; font-weight:700; color:var(--ink); }
+.wdx-pending p{ margin:3px 0 0; font-size:13px; line-height:1.5; color:var(--text); }
+#wd-form.is-blocked .wd-step, #wd-form.is-blocked .hc{ opacity:.45; pointer-events:none; }
+#transfer-form.is-blocked{ opacity:.45; pointer-events:none; }
+
+/* ---------- email code sheet ---------- */
+.pc{ position:fixed; inset:0; z-index:10060; display:flex; align-items:flex-end; justify-content:center; }
+.pc[hidden]{ display:none; }
+.pc-scrim{ position:absolute; inset:0; background:rgba(5,6,5,.74); -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px); opacity:0; transition:opacity .25s ease; }
+.pc.is-open .pc-scrim{ opacity:1; }
+.pc-card{ position:relative; width:100%; max-width:440px; padding:30px 24px 24px; border-radius:26px 26px 0 0; text-align:center; color:var(--text);
+  background:radial-gradient(90% 60% at 50% 0%, rgba(244,243,238,.07), rgba(244,243,238,0) 70%), var(--surface);
+  box-shadow:0 -12px 60px -20px rgba(0,0,0,.85), inset 0 0 0 1px rgba(244,243,238,.07);
+  transform:translateY(40px); opacity:0; transition:transform .42s var(--srv-ease), opacity .3s ease; }
+.pc.is-open .pc-card{ transform:none; opacity:1; }
+@media (min-width:640px){ .pc{ align-items:center; padding:20px; } .pc-card{ border-radius:26px; transform:translateY(14px) scale(.98); } }
+.pc-x{ position:absolute; top:14px; right:14px; display:grid; place-items:center; width:36px; height:36px; padding:0; border:0; border-radius:50%;
+  background:var(--surface-2); color:var(--muted); cursor:pointer; }
+.pc-x:hover{ background:var(--surface-3); color:var(--ink); }
+.pc-x svg{ width:14px; height:14px; }
+.pc-mark{ position:relative; display:grid; place-items:center; width:68px; height:68px; margin:0 auto 16px; border-radius:22px; color:var(--ink);
+  background:linear-gradient(180deg, rgba(244,243,238,.12), rgba(244,243,238,.03)); box-shadow:inset 0 0 0 1px rgba(244,243,238,.1), 0 18px 36px -14px rgba(0,0,0,.75); }
+.pc-mark svg{ width:28px; height:28px; }
+.pc-mark i{ position:absolute; right:-4px; bottom:-4px; display:grid; place-items:center; width:24px; height:24px; border-radius:50%;
+  background:var(--ok); color:#06120C; box-shadow:0 0 0 4px var(--surface); }
+.pc-mark i svg{ width:12px; height:12px; }
+.pc-kicker{ margin:0; font-size:11px; font-weight:700; letter-spacing:.13em; text-transform:uppercase; color:var(--muted); }
+.pc h3{ margin:8px 0 0; font-size:23px; line-height:1.2; font-weight:750; letter-spacing:-.025em; color:var(--ink); }
+.pc-lead{ margin:10px auto 0; max-width:34ch; font-size:14px; line-height:1.55; color:var(--text); }
+.pc-lead b{ color:var(--ink); font-weight:650; word-break:break-all; }
+.pc-boxes{ position:relative; display:flex; justify-content:center; gap:8px; margin:22px 0 4px; }
+.pc-cell{ display:grid; place-items:center; width:46px; height:56px; border-radius:14px; background:var(--surface-2); color:var(--ink);
+  font-size:24px; font-weight:700; font-variant-numeric:tabular-nums; box-shadow:inset 0 0 0 1px rgba(244,243,238,.06); transition:box-shadow .15s ease, background .15s ease; }
+.pc-cell.is-on{ background:var(--surface-3); box-shadow:inset 0 0 0 2px var(--ink); }
+.pc-cell.is-filled{ background:var(--surface-3); }
+.pc.is-bad .pc-cell{ box-shadow:inset 0 0 0 1.5px rgba(242,139,166,.7); animation:pcShake .35s ease; }
+.pc.is-good .pc-cell{ background:var(--ok-soft); color:var(--ok); box-shadow:inset 0 0 0 1.5px rgba(76,195,138,.5); }
+.pc-input{ position:absolute; inset:0; width:100%; height:100%; opacity:0; border:0; padding:0; font-size:16px; color:transparent; background:transparent; caret-color:transparent; cursor:text; }
+.pc-msg{ min-height:20px; margin:10px 0 0; font-size:13px; line-height:1.45; color:var(--muted); }
+.pc-msg.is-bad{ color:#F28BA6; }
+.pc .pc-ok{ width:100%; height:52px; margin-top:12px; border-radius:14px; font-size:15px; font-weight:650; }
+.pc-foot{ display:flex; align-items:center; justify-content:center; gap:8px; margin-top:14px; font-size:13px; color:var(--muted); }
+.pc-resend{ padding:0; border:0; background:none; color:var(--ink); font-size:13px; font-weight:650; text-decoration:underline; text-underline-offset:3px; cursor:pointer; }
+.pc-resend:disabled{ color:var(--muted); text-decoration:none; cursor:default; }
+.pc-safe{ display:flex; align-items:center; justify-content:center; gap:7px; margin:18px 0 0; padding-top:16px; border-top:1px solid rgba(244,243,238,.06); font-size:12px; color:var(--muted); }
+.pc-safe svg{ width:13px; height:13px; }
+@media (max-width:380px){ .pc-cell{ width:40px; height:50px; font-size:21px; } .pc-boxes{ gap:6px; } }
+html.pc-lock, html.pc-lock body{ overflow:hidden !important; }
+
+/* ---------- wallet transfer: 2% fee preview ---------- */
+.tfx-fee-note{ display:inline-flex; align-items:center; gap:6px; margin-left:6px; padding:2px 8px; border-radius:999px; background:var(--surface-3); color:var(--ink); font-size:11.5px; font-weight:700; vertical-align:1px; }
+.tfx-preview{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); margin:2px 0 16px; border-radius:16px; overflow:hidden; background:var(--surface-2); }
+.tfx-preview[hidden]{ display:none; }
+.tfx-preview > div{ position:relative; min-width:0; padding:12px 14px; }
+.tfx-preview > div + div::before{ content:""; position:absolute; left:0; top:12px; bottom:12px; width:1px; background:rgba(244,243,238,.07); }
+.tfx-preview span{ display:block; font-size:11.5px; color:var(--muted); white-space:nowrap; }
+.tfx-preview b{ display:block; margin-top:4px; font-size:17px; font-weight:750; letter-spacing:-.015em; color:var(--ink); font-variant-numeric:tabular-nums; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.tfx-preview b.is-fee{ color:#EBCB86; }
+.tfx-preview b.is-net{ color:var(--ok); }
+.tfx-secure{ display:flex; align-items:center; gap:8px; margin:12px 0 0; font-size:12.5px; color:var(--muted); }
+.tfx-secure svg{ width:14px; height:14px; flex:none; }
+
+/* ---------- survey: review time + reject reason ---------- */
+.svx-review{ display:flex; align-items:center; gap:9px; margin-top:12px; padding:10px 12px; border-radius:13px; background:rgba(224,178,90,.08); color:#EBCB86; font-size:12.5px; line-height:1.4; }
+.svx-review svg{ width:15px; height:15px; flex:none; }
+.svx-review b{ color:#F3D99E; font-weight:700; }
+.svx-reason{ margin-top:12px; padding:11px 13px; border-radius:13px; background:rgba(224,80,122,.09); box-shadow:inset 0 0 0 1px rgba(224,80,122,.14); }
+.svx-reason small{ display:block; font-size:10.5px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:#F28BA6; }
+.svx-reason p{ margin:4px 0 0; font-size:13px; line-height:1.5; color:var(--text); overflow-wrap:anywhere; }
+.svx-auto-del{ display:flex; align-items:flex-start; gap:8px; margin:10px 0 0; font-size:12.5px; line-height:1.45; color:var(--muted); text-align:left; }
+.svx-auto-del svg{ width:14px; height:14px; flex:none; margin-top:1px; }
+
+@keyframes wdxPulse{ 0%,100%{ opacity:1; } 50%{ opacity:.35; } }
+@keyframes wdxRing{ 0%{ transform:scale(.9); opacity:.9; } 100%{ transform:scale(1.25); opacity:0; } }
+@keyframes pcShake{ 0%,100%{ transform:none; } 25%{ transform:translateX(-5px); } 75%{ transform:translateX(5px); } }
+@media (max-width:520px){
+  .wdx-eta b{ font-size:19px; }
+  .tfx-preview b{ font-size:15px; }
+}
+@media (prefers-reduced-motion:reduce){
+  .wdx-live i, .wdx-pending-ico::after, .pc.is-bad .pc-cell{ animation:none !important; }
+  .pc-card, .pc-scrim{ transition:none !important; }
+}

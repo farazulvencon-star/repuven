@@ -1,0 +1,60 @@
+/* =====================================================================
+   Landing page v9: fewer sections, no payment logos
+   ===================================================================== */
+#view-landing .sv-hero9{ padding-block:clamp(40px,7vw,104px) clamp(48px,7vw,96px); }
+#view-landing .sv-hero9-grid{ display:grid; grid-template-columns:minmax(0,1.25fr) minmax(0,.75fr); gap:clamp(36px,6vw,96px); align-items:end; }
+#view-landing .sv-hero9 .sv-lede{ max-width:38ch; }
+#view-landing .sv-hero-note{ margin:22px 0 0; font-size:14.5px; line-height:1.5; color:var(--sv-faint); }
+
+#view-landing .sv-hero-facts{ list-style:none; margin:0; padding:0; display:grid; gap:12px; }
+#view-landing .sv-hero-facts li{ display:flex; flex-direction:column; gap:6px; padding:22px 24px; border-radius:14px; background:var(--sv-bg2); }
+#view-landing .sv-hero-facts b{ font:700 clamp(24px,2.2vw,30px)/1.05 var(--sv-display); letter-spacing:-.03em; color:var(--sv-ink); }
+#view-landing .sv-hero-facts span{ font-size:15px; line-height:1.4; color:var(--sv-dim); }
+
+/* how it works */
+#view-landing .sv-steps9-sec{ padding-top:clamp(28px,4vw,56px); }
+#view-landing .sv-sec-head9{ margin-bottom:clamp(28px,4vw,48px); }
+#view-landing .sv-steps9{ list-style:none; margin:0; padding:0; display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:16px; counter-reset:none; }
+#view-landing .sv-step9{ display:flex; flex-direction:column; gap:10px; padding:26px 24px 28px; border-radius:14px; background:var(--sv-bg2); }
+#view-landing .sv-step9-no{ width:36px; height:36px; display:grid; place-items:center; margin-bottom:8px; border-radius:50%; background:var(--sv-ink); color:var(--sv-bg); font:700 15px/1 var(--sv-body); }
+#view-landing .sv-step9 h3{ margin:0; font:700 20px/1.2 var(--sv-display); letter-spacing:-.02em; color:var(--sv-ink); }
+#view-landing .sv-step9 p{ margin:0; font-size:15.5px; line-height:1.55; color:var(--sv-dim); }
+
+/* closing call to action */
+#view-landing .sv-cta9{ background:var(--sv-bg2); }
+#view-landing .sv-cta9-in{ display:flex; flex-direction:column; align-items:flex-start; gap:18px; padding-block:clamp(56px,8vw,112px); }
+#view-landing .sv-cta9-h{ margin:0; font:700 clamp(40px,6vw,88px)/.95 var(--sv-display); letter-spacing:-.045em; color:var(--sv-ink); }
+#view-landing .sv-cta9-in p{ margin:0 0 10px; max-width:42ch; font-size:clamp(17px,1.5vw,20px); line-height:1.5; color:var(--sv-dim); }
+
+/* in-page links stop below the sticky header */
+#view-landing #how, #view-landing #insights{ scroll-margin-top:76px; }
+
+@media (max-width:1020px){
+  #view-landing .sv-hero9-grid{ grid-template-columns:1fr; align-items:start; }
+  #view-landing .sv-hero-facts{ grid-template-columns:repeat(3,minmax(0,1fr)); }
+  #view-landing .sv-steps9{ grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+@media (max-width:620px){
+  #view-landing .sv-hero9{ padding-top:32px; }
+  #view-landing .sv-hero-facts{ grid-template-columns:1fr; gap:10px; }
+  #view-landing .sv-hero-facts li{ flex-direction:row; flex-wrap:wrap; align-items:baseline; gap:2px 10px; padding:16px 18px; }
+  #view-landing .sv-hero-facts b{ font-size:22px; white-space:nowrap; }
+  #view-landing .sv-steps9{ grid-template-columns:1fr; gap:12px; }
+  #view-landing .sv-step9{ display:grid; grid-template-columns:36px minmax(0,1fr); gap:4px 16px; padding:20px 18px; }
+  #view-landing .sv-step9-no{ grid-row:span 2; margin:0; }
+  #view-landing .sv-cta9-in .sv-btn{ width:100%; }
+}
+
+/* =====================================================================
+   Join modal: VIP invite
+   ===================================================================== */
+#view-landing #authModal .auth-vip-note{ display:flex; gap:12px; align-items:flex-start; margin:0 0 16px; padding:14px 16px; border-radius:10px; background:var(--sv-bg3); color:var(--sv-ink); font-size:14px; line-height:1.5; }
+#view-landing #authModal .auth-vip-note[hidden]{ display:none; }
+#view-landing #authModal .auth-vip-note .vip-chip{ flex:none; padding:5px 8px; border-radius:5px; background:var(--sv-ink); color:var(--sv-bg); font:700 11px/1 var(--sv-mono); letter-spacing:.1em; }
+#view-landing #authModal .auth-vip-note b{ display:block; margin-bottom:2px; }
+#view-landing #authModal .auth-vip-note span{ color:var(--sv-dim); }
+#view-landing #authModal .auth-vip-note.is-bad{ background:rgba(224,80,122,.12); }
+#view-landing #authModal .auth-vip-note.is-bad .vip-chip{ background:#E7708F; color:#160A0E; }
+#view-landing #authModal.is-vip #signupForm .auth-divider,
+#view-landing #authModal.is-vip #signupForm .social-grid,
+#view-landing #authModal.is-vip #signupReferralField{ display:none !important; }

@@ -1,0 +1,50 @@
+/* Repuven brand colours on the landing page: black, white and the logo green.
+   Flat colour only: no glow, no light effects, no gradients. */
+#view-landing{
+  --rv-green:#1DB34A;        /* logo green */
+  --rv-green-2:#22CC52;      /* hover */
+  --rv-green-soft:rgba(29,179,74,.12);
+  --rv-green-line:rgba(29,179,74,.35);
+  --lx-ok:#1DB34A;
+}
+
+/* buttons */
+#view-landing .sv-btn-primary{ background:var(--rv-green) !important; color:#0C0D0C !important; border-color:var(--rv-green) !important; box-shadow:none !important; filter:none !important; }
+#view-landing .sv-btn-primary:hover{ background:var(--rv-green-2) !important; }
+
+/* hero */
+#view-landing .lx-dot{ background:var(--rv-green); animation:none; }
+#view-landing .lx-h1 em{ color:var(--rv-green); font-style:normal; }
+#view-landing .lx-slogan::before{ background:var(--rv-green); }
+#view-landing .lx-eyebrow{ color:var(--lx-dim); }
+
+/* cards: no drop shadows, just a thin line */
+#view-landing .lx-card,
+#view-landing .lx-wallet,
+#view-landing .lx-work-card{ box-shadow:inset 0 0 0 1px var(--lx-line) !important; }
+#view-landing .lx-checks li.done i{ background:var(--rv-green); }
+#view-landing .lx-checks li.done i::after{ border-color:#0C0D0C; }
+
+/* section labels and numbers */
+#view-landing .lx-label{ color:var(--rv-green); }
+#view-landing .lx-h2 em{ color:var(--rv-green); font-style:normal; }
+#view-landing .lx-step.is-on .lx-step-no{ background:var(--rv-green); color:#0C0D0C; }
+#view-landing .lx-tip-no{ color:var(--rv-green); }
+#view-landing .lx-feat-ic{ background:var(--rv-green-soft); color:var(--rv-green); }
+#view-landing .lx-care-item svg, #view-landing .lx-care-ic{ color:var(--rv-green); }
+#view-landing .lx-acc-q i::before, #view-landing .lx-acc-q i::after{ background:var(--rv-green); }
+#view-landing .lx-tx b.is-in, #view-landing .lx-tx .is-in b{ color:var(--rv-green); }
+#view-landing .is-total b{ color:var(--rv-green); }
+
+/* links */
+#view-landing .sv-nav a:hover, #view-landing .sv-footer-links a:hover{ color:var(--rv-green); }
+
+/* footer social icons */
+#view-landing .sv-social{ display:flex; flex-wrap:wrap; gap:10px; }
+#view-landing .sv-social[hidden]{ display:none; }
+#view-landing .sv-social-a{ width:40px; height:40px; display:grid; place-items:center; border-radius:12px; border:1px solid var(--lx-line, rgba(244,243,238,.1)); color:var(--lx-dim, #AFB5B0); text-decoration:none; transition:color .2s, border-color .2s, background-color .2s; }
+#view-landing .sv-social-a:hover{ color:#0C0D0C; background:var(--rv-green); border-color:var(--rv-green); }
+#view-landing .sv-social-a:focus-visible{ outline:2px solid var(--rv-green); outline-offset:2px; }
+@media (max-width:700px){
+  #view-landing .sv-footer-in{ flex-direction:column; align-items:flex-start; }
+}

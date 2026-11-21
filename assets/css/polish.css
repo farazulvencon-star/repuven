@@ -1,0 +1,75 @@
+/* =====================================================================
+   v13
+   ===================================================================== */
+/* VIP-only bits stay hidden for everyone else */
+html:not([data-vip]) .vip-only{ display:none !important; }
+
+/* VIP wallet: three numbers (no task earnings) */
+html[data-vip] #wallet-stats{ grid-template-columns:repeat(3,minmax(0,1fr)); }
+@media (max-width:760px){
+  html[data-vip] #wallet-stats{ grid-template-columns:1fr 1fr; }
+  html[data-vip] #wallet-stats > .stat-card:last-child{ grid-column:1 / -1; }
+}
+@media (max-width:520px){ html[data-vip] #wallet-stats{ grid-template-columns:1fr; } }
+
+/* VIP home: "Verified" next to the VIP tag */
+.vip-tags{ display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
+.vip-ok{ display:inline-flex; align-items:center; gap:5px; padding:5px 9px 5px 7px; border-radius:6px; background:var(--ok-soft); color:var(--ok); font:600 12px/1 "Instrument Sans",system-ui,sans-serif; }
+.vip-ok .icon-glyph{ width:13px; height:13px; }
+
+/* the verification ("package") section: same black surfaces and white button as the rest */
+html[data-theme] #page-profile .package-picker{ isolation:auto; }
+html[data-theme] #page-profile .package-details,
+html[data-theme] #page-profile .package-details.open{
+  margin-top:0 !important; max-height:none !important; opacity:1 !important; transform:none !important;
+  background:var(--surface-2) !important; border:0 !important; border-radius:14px !important;
+  box-shadow:none !important; animation:none !important; overflow:hidden;
+}
+html[data-theme] #page-profile .package-details::before,
+html[data-theme] #page-profile .package-details::after{ display:none !important; content:none !important; }
+html[data-theme] #page-profile .package-details-inner{ padding:22px !important; }
+@media (max-width:520px){ html[data-theme] #page-profile .package-details-inner{ padding:18px !important; } }
+html[data-theme] #page-profile .package-details .pd-head{ margin-bottom:18px !important; }
+html[data-theme] #page-profile .package-details .pd-kicker{ display:none !important; }   /* the card above already says it */
+html[data-theme] #page-profile .package-details h4{ color:var(--ink) !important; font-size:20px !important; letter-spacing:-.02em !important; }
+html[data-theme] #page-profile .package-details .pd-sub{ color:var(--muted) !important; font-size:13px !important; }
+html[data-theme] #page-profile .package-details .pd-price{ color:var(--ink) !important; font-size:28px !important; text-shadow:none !important; }
+html[data-theme] #page-profile .package-details .pd-price small{ color:var(--muted) !important; }
+html[data-theme] #page-profile .package-details ul{ gap:0 !important; margin:0 0 20px !important; }
+html[data-theme] #page-profile .package-details li{
+  opacity:1 !important; transform:none !important; animation:none !important;
+  padding:12px 0 !important; border:0 !important; border-radius:0 !important; background:none !important;
+  border-top:1px solid var(--rule) !important; color:var(--text) !important; font-size:13.5px !important; line-height:1.55 !important;
+}
+html[data-theme] #page-profile .package-details li:first-child{ border-top:0 !important; padding-top:2px !important; }
+html[data-theme] #page-profile .package-details li::before{
+  content:"" !important; width:20px !important; height:20px !important; flex:0 0 20px !important; margin-top:1px;
+  border-radius:50% !important; box-shadow:none !important;
+  background:var(--surface-3) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='%23F4F3EE' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 10.5 2.6 2.5L14 7.5'/%3E%3C/svg%3E") center / 14px no-repeat !important;
+}
+html[data-theme] #page-profile .package-details .package-buy{
+  min-height:48px !important; border-radius:12px !important; font-size:14.5px !important; font-weight:650 !important;
+  background:var(--btn) !important; color:var(--btn-ink) !important; box-shadow:none !important; border:0 !important;
+}
+html[data-theme] #page-profile .package-details .package-buy:hover:not(:disabled){ background:var(--btn-hover) !important; }
+html[data-theme] #page-profile .package-details .package-buy .icon-glyph{ color:var(--btn-ink) !important; }
+html[data-theme] #page-profile .package-note{ color:var(--muted) !important; font-size:12px !important; margin-top:10px !important; }
+html[data-theme] #page-profile .package-note a{ color:var(--ink) !important; }
+
+/* "your balance is too low" note */
+html[data-theme] #page-profile .wallet-warning{
+  display:flex !important; align-items:flex-start; gap:10px; margin:0 0 12px !important; padding:12px 14px !important;
+  border:0 !important; border-radius:12px !important; box-shadow:none !important;
+  background:var(--surface-2) !important; color:var(--text) !important; font-size:13.5px !important; line-height:1.5 !important;
+}
+html[data-theme] #page-profile .wallet-warning span:first-child{ color:var(--warn) !important; font-size:15px; line-height:1.35; }
+
+/* already verified */
+.verify-current{ display:flex; align-items:center; gap:14px; padding:16px 18px; border-radius:14px; background:var(--surface-2); }
+.verify-current .vc-icon{ flex:none; width:38px; height:38px; display:grid; place-items:center; border-radius:50%; background:var(--ok-soft); color:var(--ok); }
+.verify-current .vc-icon .icon-glyph{ width:18px; height:18px; }
+.verify-current .vc-title{ font-size:15px; font-weight:650; color:var(--ink); letter-spacing:-.01em; }
+.verify-current .vc-sub{ margin-top:3px; font-size:13px; line-height:1.5; color:var(--muted); }
+
+/* the locked Survey page */
+html[data-theme] .lock-card .icon{ background:var(--surface-3) !important; color:var(--ink) !important; }

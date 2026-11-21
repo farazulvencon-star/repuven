@@ -1,0 +1,54 @@
+/* =====================================================================
+   Announcement pop-up (after login)
+   ===================================================================== */
+html.ann-lock, html.ann-lock body{ overflow:hidden !important; }
+.ann{ position:fixed; inset:0; z-index:1150; display:grid; place-items:center; padding:20px; font-family:"Instrument Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; }
+.ann[hidden]{ display:none !important; }
+.ann-scrim{ position:absolute; inset:0; background:rgba(6,7,6,.72); -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px); opacity:0; transition:opacity .28s ease; }
+.ann.is-open .ann-scrim{ opacity:1; }
+.ann-card{ position:relative; width:min(460px, 100%); max-height:calc(100dvh - 40px); overflow:auto; overscroll-behavior:contain; outline:none;
+  border-radius:20px; background:#141615; color:#F4F3EE;
+  box-shadow:0 50px 110px -40px rgba(0,0,0,.9), inset 0 0 0 1px rgba(244,243,238,.07);
+  opacity:0; transform:translateY(18px) scale(.97); transition:opacity .3s ease, transform .42s cubic-bezier(.2,.9,.25,1); }
+.ann.is-open .ann-card{ opacity:1; transform:none; }
+/* the card itself takes focus so the keyboard starts inside it; it needs no ring */
+.ann-card:focus, .ann-card:focus-visible, .cfm-card:focus, .cfm-card:focus-visible{ outline:none !important; }
+.ann-x{ position:absolute; top:12px; right:12px; z-index:2; width:36px; height:36px; display:grid; place-items:center; padding:0; border:0; border-radius:50%;
+  background:rgba(12,13,12,.72); color:#F4F3EE; cursor:pointer; -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px); transition:background-color .15s; }
+.ann-x:hover{ background:rgba(12,13,12,.92); }
+.ann-x .icon-glyph{ width:17px; height:17px; }
+.ann-media{ position:relative; aspect-ratio:16/9; overflow:hidden; border-radius:20px 20px 0 0; background:#1B1E1C; }
+.ann-media[hidden]{ display:none; }
+.ann-media img{ width:100%; height:100%; object-fit:cover; display:block; transform:scale(1.06); transition:transform 1.4s cubic-bezier(.2,.8,.2,1); }
+.ann.is-open .ann-media img{ transform:scale(1); }
+.ann-body{ padding:22px 24px 22px; }
+.ann-media[hidden] + .ann-body{ padding-top:26px; }
+.ann-kicker{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin:0 46px 10px 0; font:500 10.5px/1.2 "DM Mono",ui-monospace,Menlo,monospace; letter-spacing:.16em; text-transform:uppercase; color:#8E958F; }
+.ann-media:not([hidden]) + .ann-body .ann-kicker{ margin-right:0; }
+.ann-title{ margin:0; font-size:23px; line-height:1.2; font-weight:650; letter-spacing:-.025em; color:#F4F3EE; overflow-wrap:anywhere; }
+.ann-text{ margin:10px 0 0; font-size:14.5px; line-height:1.6; color:#C9CDC8; white-space:pre-line; overflow-wrap:anywhere; }
+.ann-text[hidden]{ display:none; }
+.ann-foot{ display:flex; align-items:center; justify-content:space-between; gap:14px; margin-top:22px; }
+.ann-until{ font-size:12.5px; color:#8E958F; }
+.ann-actions{ display:flex; gap:8px; }
+.ann-actions .btn{ height:44px; padding:0 20px; margin:0; border-radius:12px; font-weight:650; }
+.ann-actions .btn[hidden]{ display:none !important; }
+.ann-card.is-swap .ann-body > *{ animation:ann-swap .42s cubic-bezier(.2,.9,.25,1) both; }
+.ann-card.is-swap .ann-body > *:nth-child(2){ animation-delay:.04s; }
+.ann-card.is-swap .ann-body > *:nth-child(3){ animation-delay:.08s; }
+.ann-card.is-swap .ann-body > *:nth-child(4){ animation-delay:.12s; }
+@keyframes ann-swap{ from{ opacity:0; transform:translateY(8px); } to{ opacity:1; transform:none; } }
+@media (max-width:480px){
+  .ann{ padding:14px; align-items:end; }
+  .ann-card{ max-height:calc(100dvh - 28px); border-radius:22px; }
+  .ann-media{ border-radius:22px 22px 0 0; }
+  .ann-body{ padding:20px 20px 18px; }
+  .ann-title{ font-size:21px; }
+  .ann-foot{ flex-direction:column; align-items:stretch; }
+  .ann-until{ order:2; text-align:center; }
+  .ann-actions .btn{ flex:1; }
+}
+@media (prefers-reduced-motion:reduce){
+  .ann-card, .ann-scrim, .ann-media img{ transition:opacity .01ms !important; transform:none !important; }
+  .ann-card.is-swap .ann-body > *{ animation:none; }
+}

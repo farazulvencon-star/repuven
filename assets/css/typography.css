@@ -1,0 +1,18 @@
+/* =====================================================================
+   v14: the landing page uses the phone's or computer's own font only.
+   No display, serif or mono fonts here (the rest of the site is unchanged).
+   ===================================================================== */
+#view-landing#view-landing{
+  --lx-plain:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --sv-display:var(--lx-plain); --sv-body:var(--lx-plain); --sv-mono:var(--lx-plain);
+}
+#view-landing, #view-landing *{ font-family:var(--lx-plain) !important; }
+#view-landing em{ font-style:normal !important; font-weight:inherit !important; font-size:inherit !important; letter-spacing:inherit !important; }
+/* a plain font needs less tightening than the old display font */
+#view-landing .lx-h1{ letter-spacing:-.03em; }
+#view-landing .lx-h2{ letter-spacing:-.028em; }
+#view-landing .lx-say-text{ letter-spacing:-.022em; }
+#view-landing .lx-end-h{ letter-spacing:-.035em; }
+#view-landing .lx-count{ letter-spacing:-.03em; }
+#view-landing #authModal .auth-side h2{ letter-spacing:-.03em !important; }
+#view-landing #authModal #authTitle{ letter-spacing:-.025em !important; }

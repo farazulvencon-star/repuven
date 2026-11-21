@@ -1,0 +1,66 @@
+/* Payment security (Profile) + the confirm sheet ways. The site's own colours and fonts, no glow. */
+.ps-list{ display:flex; flex-direction:column; margin-top:6px; border-radius:14px; background:var(--surface-2); }
+.ps-row{ position:relative; display:flex; align-items:center; gap:14px; padding:16px 18px; }
+.ps-row + .ps-row::before{ content:""; position:absolute; left:68px; right:18px; top:0; height:1px; background:var(--rule); }
+.ps-ico{ display:grid; place-items:center; width:38px; height:38px; flex:none; border-radius:11px; background:var(--surface-3); color:var(--ink); }
+.ps-ico svg{ width:19px; height:19px; }
+.ps-txt{ flex:1; min-width:0; }
+.ps-txt b{ display:flex; align-items:center; flex-wrap:wrap; gap:8px; font-size:14.5px; font-weight:600; color:var(--ink); }
+.ps-txt span{ display:block; margin-top:3px; font-size:12.5px; line-height:1.45; color:var(--muted); }
+.ps-chip{ display:inline-block; padding:2px 8px; border-radius:99px; background:var(--surface-3); font-style:normal; font-size:11px; font-weight:600; letter-spacing:.02em; color:var(--muted); }
+.ps-chip.is-on{ background:var(--ok-soft); color:var(--ok); }
+.ps-acts{ display:flex; flex-direction:column; align-items:flex-end; gap:6px; flex:none; }
+.ps-link{ padding:0; border:0; background:none; color:var(--text); font:inherit; font-size:12.5px; text-decoration:underline; text-underline-offset:3px; cursor:pointer; }
+.ps-link[hidden]{ display:none; }
+.ps-guide{ margin-top:14px; border-radius:14px; background:var(--surface-2); }
+.ps-guide summary{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding:15px 18px; list-style:none; cursor:pointer; font-size:14px; font-weight:600; color:var(--ink); }
+.ps-guide summary::-webkit-details-marker{ display:none; }
+.ps-guide summary::after{ content:""; width:8px; height:8px; border-right:1.6px solid var(--muted); border-bottom:1.6px solid var(--muted); transform:rotate(45deg); transition:transform .2s ease; margin-right:4px; }
+.ps-guide[open] summary::after{ transform:rotate(225deg); }
+.ps-guide ol{ margin:0; padding:0 18px 0 40px; counter-reset:none; }
+.ps-guide li{ margin:0 0 12px; padding-left:4px; font-size:13.5px; line-height:1.6; color:var(--text); }
+.ps-guide li::marker{ color:var(--muted); font-weight:600; }
+.ps-guide li b{ color:var(--ink); font-weight:600; }
+.ps-guide a{ color:var(--ink); text-decoration:underline; text-underline-offset:3px; }
+.ps-guide p{ margin:4px 18px 0; padding:12px 0 16px; border-top:1px solid var(--rule); font-size:12.5px; line-height:1.55; color:var(--muted); }
+@media (max-width:560px){
+  .ps-row{ flex-wrap:wrap; padding:14px; }
+  .ps-row + .ps-row::before{ left:14px; right:14px; }
+  .ps-acts{ width:100%; flex-direction:row; align-items:center; justify-content:space-between; padding-left:52px; }
+}
+
+/* confirm sheet: choose a way */
+.pc-ways{ display:flex; gap:4px; margin:14px auto 2px; padding:4px; max-width:360px; border-radius:13px; background:var(--surface-2); }
+.pc-ways[hidden]{ display:none; }
+.pc-ways button{ flex:1; display:flex; flex-direction:column; align-items:center; gap:4px; min-width:0; padding:8px 4px; border:0; border-radius:10px; background:none; color:var(--muted); font:inherit; font-size:11.5px; font-weight:600; cursor:pointer; }
+.pc-ways button svg{ width:17px; height:17px; }
+.pc-ways button span{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; }
+.pc-ways button.active{ background:var(--surface-3); color:var(--ink); }
+.pc-boxes.is-pin .pc-cell{ font-size:30px; }
+.pc-lead b{ word-break:normal; overflow-wrap:anywhere; }
+
+/* setup sheet (sits under the confirm sheet) */
+.pc.ps{ z-index:10050; }
+.ps .ps-card{ max-height:92dvh; overflow-y:auto; }
+.ps-body.is-swap{ animation:psIn .3s var(--srv-ease, ease) both; }
+@keyframes psIn{ from{ opacity:0; transform:translateY(6px); } to{ opacity:1; transform:none; } }
+.ps .pc-kicker{ margin-bottom:6px; }
+.ps-stores{ display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:20px 0 4px; }
+.ps-store{ display:flex; flex-direction:column; align-items:flex-start; padding:12px 14px; border-radius:13px; background:var(--surface-2); color:var(--ink); text-decoration:none; text-align:left; }
+.ps-store:hover{ background:var(--surface-3); }
+.ps-store small{ font-size:11.5px; color:var(--muted); }
+.ps-store b{ margin-top:2px; font-size:14.5px; font-weight:600; }
+.ps-note{ margin:14px 0 0; font-size:12.5px; line-height:1.5; color:var(--muted); }
+.ps-qr{ display:grid; place-items:center; width:196px; height:196px; margin:20px auto 0; padding:12px; border-radius:18px; background:#fff; }
+.ps-qr img{ width:100%; height:100%; display:block; image-rendering:pixelated; }
+.ps-same{ display:flex; flex-direction:column; gap:8px; margin-top:18px; padding:16px; border-radius:14px; background:var(--surface-2); text-align:left; font-size:13px; line-height:1.5; color:var(--text); }
+.ps-same > b{ color:var(--ink); font-size:13.5px; font-weight:600; }
+.ps-same b{ color:var(--ink); font-weight:600; }
+.ps-key{ display:flex; align-items:center; gap:8px; padding:8px 8px 8px 12px; border-radius:10px; background:var(--surface-3); }
+.ps-key code{ flex:1; min-width:0; font:600 13px/1.4 var(--font-mono); letter-spacing:.06em; color:var(--ink); overflow-wrap:anywhere; }
+.ps-small{ font-size:11.5px; color:var(--muted); }
+.ps-open{ width:100%; justify-content:center; margin-top:2px; }
+.ps-done{ display:grid; place-items:center; width:64px; height:64px; margin:4px auto 16px; border-radius:20px; background:var(--ok-soft); color:var(--ok); }
+.ps-done .icon-glyph{ width:28px; height:28px; }
+.ps .pc-foot{ margin-top:14px; }
+@media (prefers-reduced-motion: reduce){ .ps-body.is-swap{ animation:none; } }

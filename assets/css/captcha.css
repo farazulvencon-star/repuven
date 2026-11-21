@@ -1,0 +1,56 @@
+.cf-host{ position:fixed; left:0; right:0; top:var(--vvt, 0px); height:var(--vvh, 100dvh); z-index:10080; display:grid; place-items:center; padding:16px; }
+.cf-host.idle{ top:auto; bottom:0; left:0; right:auto; height:auto; padding:0; opacity:0; pointer-events:none; }
+.cf-host.idle .cf-scrim, .cf-host.idle .cf-card b, .cf-host.idle .cf-card span{ display:none; }
+.cf-host.idle .cf-card{ padding:0; background:none; box-shadow:none; width:auto; }
+.cf-scrim{ position:absolute; inset:0; background:rgba(5,6,5,.62); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); }
+.cf-card{ position:relative; display:flex; flex-direction:column; align-items:center; gap:6px; width:min(360px, 100%); padding:22px 18px 18px; border-radius:22px; background:#141615; color:#C9CDC8; text-align:center; font-family:inherit; box-shadow:0 24px 60px rgba(0,0,0,.45); }
+.cf-card b{ font-size:16px; font-weight:600; color:#F4F3EE; }
+.cf-card span{ font-size:13px; color:#8E958F; }
+.cf-slot{ margin-top:10px; min-height:65px; display:grid; place-items:center; }
+
+.pz-host{ position:fixed; left:0; right:0; top:var(--vvt, 0px); height:var(--vvh, 100dvh); z-index:10070; display:grid; place-items:center; padding:12px;
+  font-family:"Instrument Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; -webkit-tap-highlight-color:transparent; }
+.pz-scrim{ position:absolute; inset:0; background:rgba(5,6,5,.62); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); opacity:0; transition:opacity .2s ease; }
+.pz-card{ position:relative; width:min(320px, 100%); padding:20px 18px 14px; border-radius:22px; background:#141615; color:#C9CDC8;
+  box-shadow:0 24px 60px rgba(0,0,0,.45), inset 0 0 0 1px rgba(244,243,238,.05); opacity:0; transform:translateY(12px) scale(.98);
+  transition:opacity .2s ease, transform .25s cubic-bezier(.2,.8,.2,1); user-select:none; -webkit-user-select:none; }
+.pz-in .pz-scrim{ opacity:1; } .pz-in .pz-card{ opacity:1; transform:none; }
+.pz-out .pz-scrim{ opacity:0; } .pz-out .pz-card{ opacity:0; transform:translateY(8px) scale(.98); }
+.pz-x{ position:absolute; top:10px; right:10px; width:32px; height:32px; padding:0; border:0; border-radius:10px; background:transparent; color:#8E958F; cursor:pointer; display:grid; place-items:center; }
+.pz-x:hover{ background:rgba(244,243,238,.06); color:#F4F3EE; }
+.pz-x svg{ width:18px; height:18px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; }
+.pz-title{ display:block; padding-right:34px; font-size:16px; font-weight:600; color:#F4F3EE; letter-spacing:-.01em; }
+.pz-sub{ display:block; margin-top:4px; min-height:17px; font-size:12.5px; color:#8E958F; }
+.pz-stage{ position:relative; width:280px; height:160px; margin:14px auto 12px; border-radius:12px; overflow:hidden; background:#0E2118; }
+.pz-pic{ display:block; }
+.pz-piece{ position:absolute; left:5px; top:0; cursor:grab; touch-action:none; filter:drop-shadow(0 3px 6px rgba(0,0,0,.55)); }
+.pz-drag .pz-piece{ cursor:grabbing; }
+.pz-anim{ transition:left .28s cubic-bezier(.2,.8,.2,1), transform .28s cubic-bezier(.2,.8,.2,1), width .28s cubic-bezier(.2,.8,.2,1) !important; }
+.pz-done{ position:absolute; inset:0; display:grid; place-items:center; background:rgba(8,20,14,.55); opacity:0; transition:opacity .25s ease; pointer-events:none; }
+.pz-done svg{ width:54px; height:54px; padding:12px; border-radius:50%; background:#4CC38A; fill:none; stroke:#0C0D0C; stroke-width:2.6; stroke-linecap:round; stroke-linejoin:round;
+  stroke-dasharray:22; stroke-dashoffset:22; transform:scale(.7); transition:transform .3s cubic-bezier(.2,.8,.2,1); }
+.pz-ok .pz-done{ opacity:1; } .pz-ok .pz-done svg{ transform:none; animation:pz-tick .35s .1s ease forwards; }
+@keyframes pz-tick{ to{ stroke-dashoffset:0; } }
+.pz-track{ position:relative; width:280px; height:44px; margin:0 auto; border-radius:12px; background:#0D0F0E; box-shadow:inset 0 0 0 1px rgba(244,243,238,.08); overflow:hidden; }
+.pz-fill{ position:absolute; left:0; top:0; bottom:0; width:22px; background:rgba(76,195,138,.16); }
+.pz-hint{ position:absolute; inset:0; display:grid; place-items:center; padding-left:44px; font-size:13px; color:#6F7671; pointer-events:none; transition:opacity .2s; }
+.pz-moved .pz-hint{ opacity:0; }
+.pz-handle{ position:absolute; left:0; top:0; width:44px; height:44px; padding:0; border:0; border-radius:12px; background:#F4F3EE; color:#0C0D0C; cursor:grab; touch-action:none; display:grid; place-items:center; }
+.pz-host .pz-handle:focus{ outline:none !important; }
+.pz-host .pz-handle:focus-visible{ outline:2px solid #4CC38A !important; outline-offset:2px; }
+.pz-drag .pz-handle{ cursor:grabbing; background:#fff; }
+.pz-fit .pz-handle{ background:#4CC38A; }
+.pz-fit .pz-fill{ background:rgba(76,195,138,.28); }
+.pz-handle svg{ width:20px; height:20px; fill:none; stroke:currentColor; stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round; }
+.pz-foot{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:12px; min-height:28px; }
+.pz-new{ display:inline-flex; align-items:center; gap:6px; padding:5px 8px 5px 6px; margin-left:-6px; border:0; border-radius:8px; background:transparent; color:#8E958F; font:inherit; font-size:12.5px; cursor:pointer; }
+.pz-new:hover{ color:#F4F3EE; background:rgba(244,243,238,.06); }
+.pz-new svg{ width:15px; height:15px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+.pz-fit .pz-new{ visibility:hidden; }
+.pz-work{ display:inline-flex; align-items:center; gap:8px; font-size:11.5px; color:#6F7671; font-variant-numeric:tabular-nums; }
+.pz-work i{ display:block; width:54px; height:3px; border-radius:3px; background:rgba(244,243,238,.08); overflow:hidden; }
+.pz-work em{ display:block; height:100%; width:0; background:#4CC38A; transition:width .3s ease; }
+.pz-shake{ animation:pz-shake .38s ease; }
+@keyframes pz-shake{ 20%{ transform:translateX(-7px); } 45%{ transform:translateX(6px); } 70%{ transform:translateX(-3px); } }
+@media (max-width:340px){ .pz-card{ padding:18px 10px 12px; } }
+@media (prefers-reduced-motion:reduce){ .pz-card, .pz-anim, .pz-scrim{ transition:none !important; } .pz-shake{ animation:none; } }

@@ -1,0 +1,34 @@
+/* Survey: 7 tasks a day (Bangladesh time). Device font only (inherits the .svx scope). */
+.svx-quota{ margin:0 0 14px; padding:14px 16px 13px; border-radius:18px;
+  background:radial-gradient(90% 160% at 0% 0%, rgba(244,243,238,.06), rgba(244,243,238,0) 60%), var(--surface); box-shadow:inset 0 0 0 1px var(--svx-hair); }
+.svx-quota[hidden]{ display:none; }
+.svx-quota.is-full{ background:radial-gradient(90% 160% at 0% 0%, rgba(224,178,90,.15), rgba(224,178,90,0) 60%), var(--surface); box-shadow:inset 0 0 0 1px rgba(224,178,90,.22); }
+.svx-q-top{ display:flex; align-items:center; justify-content:space-between; gap:12px; }
+.svx-q-top small{ display:block; font-size:10.5px; font-weight:700; letter-spacing:.11em; text-transform:uppercase; color:var(--muted); }
+.svx-quota.is-full .svx-q-top small{ color:var(--warn); }
+.svx-q-top b{ display:block; margin-top:4px; font-size:24px; line-height:1; font-weight:800; letter-spacing:-.02em; color:var(--ink); font-variant-numeric:tabular-nums; }
+.svx-q-top b span{ margin-left:3px; font-size:15px; font-weight:650; color:var(--muted); }
+.svx-q-pill{ flex:none; display:inline-flex; align-items:center; gap:6px; height:28px; padding:0 11px; border-radius:999px; background:var(--surface-3); color:var(--ink);
+  font-size:12.5px; font-weight:700; white-space:nowrap; font-variant-numeric:tabular-nums; }
+.svx-quota.is-full .svx-q-pill{ background:var(--warn-soft); color:var(--warn); }
+.svx-q-pill svg{ width:13px; height:13px; }
+.svx-q-bar{ display:flex; gap:5px; margin-top:12px; }
+.svx-q-bar i{ flex:1; height:6px; border-radius:6px; background:rgba(244,243,238,.08); transition:background .3s ease; }
+.svx-q-bar i.on{ background:var(--ink); }
+.svx-quota.is-full .svx-q-bar i.on{ background:var(--warn); }
+.svx-q-fill{ flex:1; height:6px; border-radius:6px; background:rgba(244,243,238,.08); overflow:hidden; }
+.svx-q-fill i{ display:block; height:100%; border-radius:6px; background:var(--ink); }
+.svx-quota.is-full .svx-q-fill i{ background:var(--warn); }
+.svx-q-note{ margin:10px 0 0; font-size:12.5px; line-height:1.45; color:var(--muted); }
+.svx-q-note b{ color:var(--text); font-weight:650; }
+/* task cards once the day's limit is used up */
+.svx-card.is-capped{ cursor:default; }
+.svx-card.is-capped .svx-media img, .svx-card.is-capped .svx-cover{ filter:saturate(.7) brightness(.85); }
+.svx-capped{ flex:none; display:inline-flex; align-items:center; gap:7px; height:42px; padding:0 14px; border-radius:12px; background:var(--surface-3);
+  color:var(--muted); font-size:13.5px; font-weight:650; white-space:nowrap; }
+.svx-capped svg{ width:14px; height:14px; }
+/* in the task sheet */
+.svx-q-chip{ display:flex; align-items:center; gap:8px; margin:12px 0 0; font-size:12.5px; color:var(--muted); }
+.svx-q-chip[hidden]{ display:none; }
+.svx-q-chip svg{ width:14px; height:14px; flex:none; }
+.svx-q-chip b{ color:var(--ink); font-weight:700; }

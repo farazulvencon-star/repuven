@@ -1,0 +1,7 @@
+/* the way to the admin panel for a supportive admin (sidebar) */
+.sa-link{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin:0 0 10px; padding:11px 12px 11px 14px; border-radius:12px;
+  background:var(--surface-2); color:var(--ink); text-decoration:none; box-shadow:inset 0 0 0 1px rgba(244,243,238,.07); transition:background .2s ease; }
+.sa-link:hover{ background:var(--surface-3); }
+.sa-link b{ display:block; font-size:13.5px; font-weight:650; }
+.sa-link small{ display:block; margin-top:2px; font-size:11.5px; color:var(--muted); }
+.sa-link .icon-glyph{ flex:none; width:15px; height:15px; color:var(--muted); }

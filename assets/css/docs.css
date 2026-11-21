@@ -1,0 +1,78 @@
+/* =====================================================================
+   Privacy / Terms / Help pages
+   ===================================================================== */
+html.doc-open, html.doc-open body{ overflow:hidden !important; }
+.docv{
+  --d-bg:#0C0D0C; --d-surface:#141615; --d-surface-2:#1B1E1C; --d-ink:#F4F3EE; --d-text:#C9CDC8; --d-muted:#8E958F; --d-rule:rgba(244,243,238,.08);
+  position:fixed; inset:0; z-index:10050; overflow-y:auto; -webkit-overflow-scrolling:touch; overscroll-behavior:contain;
+  background:var(--d-bg); color:var(--d-text);
+  font:400 16px/1.7 "Instrument Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+.docv a{ color:var(--d-ink); text-decoration:underline; text-decoration-color:rgba(244,243,238,.35); text-underline-offset:3px; }
+.docv a:hover{ text-decoration-color:var(--d-ink); }
+
+.docv-top{ position:sticky; top:0; z-index:2; background:rgba(12,13,12,.94); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); }
+.docv-top-in{ max-width:1080px; margin:0 auto; padding:14px 24px; display:flex; align-items:center; gap:20px; }
+.docv .docv-brand{ display:flex; align-items:center; gap:10px; text-decoration:none; color:var(--d-ink); font:700 17px/1 "Bricolage Grotesque",system-ui,sans-serif; letter-spacing:-.02em; flex:none; }
+.docv-brand img{ width:30px; height:30px; display:block; }
+.docv-tabs{ display:flex; gap:4px; margin-left:auto; padding:4px; background:var(--d-surface); border-radius:10px; }
+.docv .docv-tabs a{ padding:7px 14px; border-radius:7px; text-decoration:none; color:var(--d-muted); font-size:14px; font-weight:600; line-height:1.2; white-space:nowrap; transition:background .15s,color .15s; }
+.docv .docv-tabs a:hover{ color:var(--d-ink); }
+.docv .docv-tabs a.active{ background:var(--d-ink); color:#0C0D0C; }
+.docv-close{ width:38px; height:38px; flex:none; display:grid; place-items:center; border:0; border-radius:10px; background:var(--d-surface); color:var(--d-ink); cursor:pointer; }
+.docv-close:hover{ background:var(--d-surface-2); }
+.docv-close svg{ width:18px; height:18px; }
+
+.docv-main{ max-width:720px; margin:0 auto; padding:56px 24px 40px; }
+.docv-article[hidden]{ display:none !important; }
+.docv .docv-kicker{ margin:0 0 14px; font:500 12px/1 "DM Mono",ui-monospace,monospace; letter-spacing:.14em; text-transform:uppercase; color:var(--d-muted); }
+.docv h1{ margin:0; font:800 clamp(32px,6vw,48px)/1.04 "Bricolage Grotesque",system-ui,sans-serif; letter-spacing:-.035em; color:var(--d-ink); }
+.docv .docv-meta{ margin:18px 0 0; font:500 13px/1.4 "DM Mono",ui-monospace,monospace; color:var(--d-muted); }
+.docv .docv-lead{ margin:26px 0 8px; font-size:18px; line-height:1.65; color:var(--d-text); }
+.docv section{ padding:28px 0 4px; border-top:1px solid var(--d-rule); margin-top:28px; }
+.docv h2{ display:flex; align-items:baseline; gap:12px; margin:0 0 12px; font:700 21px/1.3 "Bricolage Grotesque",system-ui,sans-serif; letter-spacing:-.02em; color:var(--d-ink); }
+.docv h2 span{ font:500 12px/1 "DM Mono",ui-monospace,monospace; letter-spacing:.08em; color:var(--d-muted); }
+.docv p{ margin:0 0 12px; }
+.docv b{ color:var(--d-ink); font-weight:600; }
+.docv ul{ margin:0 0 12px; padding:0; list-style:none; }
+.docv li{ position:relative; padding-left:22px; margin:0 0 10px; }
+.docv li::before{ content:""; position:absolute; left:2px; top:.72em; width:6px; height:6px; background:var(--d-ink); }
+.docv .docv-note{ margin-top:14px !important; padding:14px 16px; border-radius:10px; background:var(--d-surface); color:var(--d-ink); font-weight:600; }
+
+.docv-contact{ margin:28px 0 12px; padding:22px; border-radius:14px; background:var(--d-surface); display:flex; align-items:center; gap:18px; }
+.docv-contact > div{ flex:1; min-width:0; }
+.docv .docv-contact-title{ display:block; font:700 18px/1.3 "Bricolage Grotesque",system-ui,sans-serif; color:var(--d-ink); }
+.docv .docv-contact p{ margin:6px 0 0; font-size:15px; }
+.docv .docv-btn{ flex:none; display:inline-flex; align-items:center; justify-content:center; min-height:44px; padding:0 18px; border-radius:10px; background:var(--d-ink); color:#0C0D0C; text-decoration:none; font-weight:700; font-size:15px; }
+.docv .docv-btn:hover{ background:#E1E0D9; }
+.docv .docv-warn{ font-size:14px; color:var(--d-muted); }
+.docv-faq{ margin:30px 0 22px; display:flex; flex-direction:column; gap:8px; }
+.docv-faq details{ border-radius:12px; background:var(--d-surface); }
+.docv-faq summary{ list-style:none; cursor:pointer; padding:16px 52px 16px 18px; position:relative; font-weight:600; color:var(--d-ink); }
+.docv-faq summary::-webkit-details-marker{ display:none; }
+.docv-faq summary::after{ content:""; position:absolute; right:20px; top:50%; width:9px; height:9px; margin-top:-7px; border-right:1.8px solid var(--d-muted); border-bottom:1.8px solid var(--d-muted); transform:rotate(45deg); transition:transform .2s, margin-top .2s; }
+.docv-faq details[open] summary::after{ transform:rotate(-135deg); margin-top:-2px; }
+.docv .docv-faq details p{ margin:0; padding:0 18px 18px; font-size:15.5px; }
+.docv .docv-links{ font-size:15px; color:var(--d-muted); }
+
+.docv-foot{ max-width:720px; margin:0 auto; padding:26px 24px 44px; display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; border-top:1px solid var(--d-rule); font-size:14px; color:var(--d-muted); }
+.docv-foot nav{ display:flex; gap:20px; }
+.docv .docv-foot a{ color:var(--d-muted); text-decoration:none; }
+.docv .docv-foot a:hover{ color:var(--d-ink); }
+
+/* links under the sign-up form and in the app menu */
+#view-landing #authModal .auth-terms a{ color:inherit; text-decoration:underline; text-underline-offset:2px; }
+.sidebar-legal{ display:flex; justify-content:center; gap:14px; margin-top:12px; }
+.sidebar-legal a{ font-size:12px; color:var(--muted); text-decoration:none; }
+.sidebar-legal a:hover{ color:var(--ink); }
+
+@media (max-width:640px){
+  .docv-top-in{ padding:10px 16px; gap:10px; }
+  .docv .docv-brand span{ display:none; }
+  .docv-tabs{ margin-left:0; flex:1; justify-content:center; }
+  .docv .docv-tabs a{ padding:7px 10px; font-size:13.5px; }
+  .docv-main{ padding:36px 16px 28px; }
+  .docv .docv-lead{ font-size:16.5px; }
+  .docv-contact{ flex-direction:column; align-items:stretch; }
+  .docv-foot{ padding:22px 16px 36px; }
+}

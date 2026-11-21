@@ -1,0 +1,6 @@
+.team-wrap{ position:relative; padding:4px 24px 20px }
+.team-frame{ display:block; width:100%; height:calc(100dvh - 150px); min-height:520px; border:0; background:transparent; color-scheme:dark }
+.team-load{ position:absolute; inset:0; display:grid; place-items:center; pointer-events:none }
+.team-load[hidden]{ display:none }
+.team-msg{ max-width:380px; padding:20px; text-align:center; color:var(--muted); pointer-events:auto }
+@media (max-width:760px){ .team-wrap{ padding:4px 10px 12px } .team-frame{ height:calc(100dvh - 120px); min-height:440px } }

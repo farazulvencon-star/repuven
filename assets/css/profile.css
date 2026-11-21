@@ -1,0 +1,9 @@
+.auth-field-hint{ display:block; margin-top:6px; font-size:12px; line-height:1.45; opacity:.7; }
+.pf-phone-hint{ display:block; margin-top:6px; font-size:12px; line-height:1.45; color:var(--muted); }
+.pf-phone-hint.is-missing{ color:var(--warn); }
+#form-name .grid.grid-2{ grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); }
+
+.ref-locked{ flex-wrap:wrap; }
+.ref-locked .vc-icon{ background:var(--surface); color:var(--muted); }
+.ref-locked[hidden], #ref-share[hidden]{ display:none !important; }
+@media (max-width:640px){ .ref-locked .btn{ width:100%; } }
