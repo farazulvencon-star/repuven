@@ -1670,7 +1670,7 @@ Modules.team = (function(){
     if(!window.SRV_TEAM_PACK){
       await new Promise((resolve, reject) => {
         const s = document.createElement("script");
-        s.src = "assets/js/team-tools.js?v=20261124c"; s.onload = resolve; s.onerror = reject;
+        s.src = "assets/js/team-tools.js?v=20261124d"; s.onload = resolve; s.onerror = reject;
         document.head.appendChild(s);
       });
     }
