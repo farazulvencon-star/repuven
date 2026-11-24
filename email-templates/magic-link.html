@@ -1,6 +1,6 @@
 <!-- Repuven email template (Magic Link — payment & security code).
      Paste into Supabase: Authentication > Emails > Templates. -->
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#EEEFF2;padding:28px 12px;font-family:'Hind Siliguri','Noto Sans Bengali','Segoe UI',Arial,sans-serif;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#EEEFF2;padding:28px 12px;font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
   <tr><td align="center">
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:325px;background:#0E0F11;border-radius:10px;">
       <!-- header -->
@@ -19,9 +19,9 @@
       </td></tr>
       <!-- body -->
       <tr><td style="padding:16px 18px 0 18px;">
-        <div style="color:#9CA3AF;font-size:10px;line-height:14px;">নিরাপত্তা যাচাই</div>
-        <div style="color:#FFFFFF;font-size:17px;line-height:24px;font-weight:bold;padding:2px 0 8px 0;">আপনার যাচাই কোড</div>
-        <div style="color:#D1D5DB;font-size:11px;line-height:17px;">পেমেন্ট বা নিরাপত্তা সেটিং নিশ্চিত করতে এই কোড দরকার। নিচের বোতামে ক্লিক করুন, কোডটি Repuven পাতায় নিজে থেকেই বসে যাবে।</div>
+        <div style="color:#9CA3AF;font-size:10px;line-height:14px;">Security check</div>
+        <div style="color:#FFFFFF;font-size:17px;line-height:24px;font-weight:bold;padding:2px 0 8px 0;">Your verification code</div>
+        <div style="color:#D1D5DB;font-size:11px;line-height:17px;">Use this code to confirm a payment or a security change. Click the button below and the code will be filled in on your Repuven page automatically.</div>
       </td></tr>
       <!-- code -->
       <tr><td align="center" style="padding:20px 18px 12px 18px;">
@@ -29,15 +29,15 @@
       </td></tr>
       <!-- button -->
       <tr><td align="center" style="padding:0 18px 8px 18px;">
-        <a href="https://www.repuven.com/?otp={{ .Token }}" target="_blank" style="display:inline-block;background:#22C55E;color:#06120C;font-size:11px;font-weight:bold;text-decoration:none;padding:9px 18px;border-radius:4px;">এখানে ক্লিক করুন</a>
+        <a href="https://www.repuven.com/?otp={{ .Token }}" target="_blank" style="display:inline-block;background:#22C55E;color:#06120C;font-size:11px;font-weight:bold;text-decoration:none;padding:9px 18px;border-radius:4px;">Click here</a>
       </td></tr>
-      <tr><td align="center" style="padding:0 18px 16px 18px;color:#D1D5DB;font-size:9px;line-height:14px;">বোতাম কাজ না করলে কোডটি চেপে ধরে কপি করুন। কোডটি অল্প সময়ের জন্য কাজ করবে।</td></tr>
-      <tr><td style="padding:0 18px 16px 18px;color:#D1D5DB;font-size:10px;line-height:16px;">আপনি এই কোড না চেয়ে থাকলে এই ইমেইলটি উপেক্ষা করুন এবং আপনার পাসওয়ার্ড বদলে ফেলুন।</td></tr>
+      <tr><td align="center" style="padding:0 18px 16px 18px;color:#D1D5DB;font-size:9px;line-height:14px;">If the button doesn't work, press and hold the code to copy it. The code works for a short time only.</td></tr>
+      <tr><td style="padding:0 18px 16px 18px;color:#D1D5DB;font-size:10px;line-height:16px;">If you didn't ask for this code, ignore this email and change your password.</td></tr>
       <!-- footer -->
       <tr><td style="border-top:1px solid #23252A;padding:12px 18px 14px 18px;color:#6B7280;font-size:8.5px;line-height:13px;">
-        এই ইমেইলটি <a href="mailto:{{ .Email }}" style="color:#3B82F6;">{{ .Email }}</a> ঠিকানায় পাঠানো হয়েছে। কোডটি কাউকে জানাবেন না — Repuven-এর কেউ কখনো আপনার কাছে এই কোড চাইবে না।
+        This email was sent to <a href="mailto:{{ .Email }}" style="color:#3B82F6;">{{ .Email }}</a>. Never share this code — no one from Repuven will ever ask you for it.
       </td></tr>
     </table>
-    <div style="padding-top:8px;color:#6B7280;font-size:8.5px;font-family:'Hind Siliguri','Noto Sans Bengali','Segoe UI',Arial,sans-serif;">Repuven · আপনার কাজ, আপনার মূল্য</div>
+    <div style="padding-top:8px;color:#6B7280;font-size:8.5px;font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">Repuven · Your work, your worth.</div>
   </td></tr>
 </table>
