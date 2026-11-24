@@ -296,6 +296,110 @@ const PayRates = (function(){
 })();
 function taka(n){ return "৳" + Math.round(Number(n || 0)).toLocaleString("en-US"); }
 
+/* ---------------- "Click here" button in the code email ----------------
+   The email button opens  https://www.repuven.com/?otp=123456 .
+   That new tab hands the code to the Repuven tab that is waiting for it (the payment /
+   security sheet or the password-reset form), which fills it in and checks it by itself.
+   If no tab is waiting, the new tab shows the code with a Copy button. */
+const OtpLink = (function(){
+  const CH = "BroadcastChannel" in window ? new BroadcastChannel("srv-otp") : null;
+  const handlers = new Set();
+  let incoming = null;
+  try{
+    const qp = new URLSearchParams(location.search);
+    if(qp.has("otp")){
+      const c = String(qp.get("otp") || "").replace(/\D/g, "");
+      if(c.length >= 6 && c.length <= 10) incoming = c;
+      qp.delete("otp");
+      const rest = qp.toString();
+      history.replaceState(null, "", location.pathname + (rest ? "?" + rest : "") + location.hash);
+    }
+  }catch(e){}
+
+  function offer(code){
+    for(const h of handlers){ try{ if(h(code)) return true; }catch(e){ console.error(e); } }
+    return false;
+  }
+  // another tab opened the email button: fill the code here if a form is waiting
+  if(CH) CH.addEventListener("message", e => {
+    const d = e.data || {};
+    if(d.t === "otp" && d.code && offer(String(d.code))){ CH.postMessage({ t:"ack", id:d.id }); try{ window.focus(); }catch(_){} }
+  });
+  window.addEventListener("storage", e => {          // for browsers without BroadcastChannel
+    if(e.key !== "srv-otp" || !e.newValue || CH) return;
+    try{ const d = JSON.parse(e.newValue); if(Date.now() - d.at < 60000 && offer(String(d.code))) localStorage.setItem("srv-otp-ack", d.id); }catch(_){}
+  });
+
+  function listen(fn){ handlers.add(fn); return () => handlers.delete(fn); }
+
+  function handOff(code){
+    const id = Math.random().toString(36).slice(2);
+    return new Promise(res => {
+      let done = false;
+      const finish = v => {
+        if(done) return; done = true;
+        if(CH) CH.removeEventListener("message", onMsg);
+        window.removeEventListener("storage", onStore);
+        try{ localStorage.removeItem("srv-otp"); }catch(_){}
+        res(v);
+      };
+      const onMsg = e => { if(e.data && e.data.t === "ack" && e.data.id === id) finish(true); };
+      const onStore = e => { if(e.key === "srv-otp-ack" && e.newValue === id) finish(true); };
+      if(CH){ CH.addEventListener("message", onMsg); CH.postMessage({ t:"otp", code, id }); }
+      else{ window.addEventListener("storage", onStore); try{ localStorage.setItem("srv-otp", JSON.stringify({ code, id, at:Date.now() })); }catch(_){} }
+      setTimeout(() => finish(false), 1500);
+    });
+  }
+
+  function card(code, filled){
+    const el = document.createElement("div");
+    el.className = "otp-link";
+    el.innerHTML = `
+      <div class="otp-link-card" role="dialog" aria-modal="true" aria-labelledby="otp-link-title">
+        <button type="button" class="otp-link-x" data-otp-close aria-label="Close"><svg class="icon-glyph" viewBox="0 0 24 24"><use href="#i-x"/></svg></button>
+        ${filled ? `
+          <div class="otp-link-ok"><svg class="icon-glyph" viewBox="0 0 24 24"><use href="#i-check"/></svg></div>
+          <h3 id="otp-link-title">Code filled in</h3>
+          <p>Your code was put in on your open Repuven page and is being checked there. You can close this tab and go back to it.</p>
+          <button type="button" class="btn btn-primary btn-block" data-otp-close>Okay</button>`
+        : `
+          <h3 id="otp-link-title">Your Repuven code</h3>
+          <div class="otp-link-code">${escapeHtml(code)}</div>
+          <p>Go back to the Repuven page where you asked for the code and paste it there.</p>
+          <button type="button" class="btn btn-primary btn-block" data-otp-copy>Copy code</button>`}
+      </div>`;
+    document.body.appendChild(el);
+    el.addEventListener("click", async e => {
+      if(e.target === el || e.target.closest("[data-otp-close]")){ el.remove(); return; }
+      const b = e.target.closest("[data-otp-copy]");
+      if(b){
+        try{ await navigator.clipboard.writeText(code); }catch(_){
+          const t = document.createElement("textarea"); t.value = code; document.body.appendChild(t); t.select(); try{ document.execCommand("copy"); }catch(__){} t.remove();
+        }
+        b.textContent = "Copied"; setTimeout(() => { b.textContent = "Copy code"; }, 1600);
+      }
+    });
+  }
+
+  /** Called once the app has started. */
+  async function deliver(){
+    if(!incoming) return;
+    const code = incoming; incoming = null;
+    if(offer(code)) return;                               // a form on this page is waiting
+    if(await handOff(code)){ card(code, true); return; }  // filled in on the other open tab
+    // password reset asked for in this browser, but that tab is closed: carry on here
+    let reset = null;
+    try{ reset = JSON.parse(localStorage.getItem("srv-reset-email") || "null"); }catch(_){}
+    if(!AppState.session && reset && reset.email && Date.now() - (reset.at || 0) < 3600000){
+      Router.go("auth/forgot");
+      setTimeout(() => { if(!AuthModule.resumeWithCode(reset.email, code)) card(code, false); }, 150);
+      return;
+    }
+    card(code, false);
+  }
+  return { listen, deliver };
+})();
+
 /* ---------------- Email code before money leaves a wallet ----------------
    PayCode.ask({ what:"withdrawal" }) opens a sheet, emails a code to the member
    and resolves true once the code is confirmed (false if they close it).
@@ -349,6 +453,17 @@ const PayCode = (function(){
     input.addEventListener("focus", paint); input.addEventListener("blur", paint);
     root.querySelector("#pc-boxes").addEventListener("click", () => input.focus());
     root.querySelector("#pc-ok").addEventListener("click", verify);
+    // code arrived from the "Click here" button in the email
+    OtpLink.listen(code => {
+      if(!root || root.hidden || !sent || !modes.includes("email")) return false;
+      if(mode !== "email") setMode("email");
+      const box = root.querySelector("#pc-input");
+      box.value = code.slice(0, 10);
+      root.classList.remove("is-bad");
+      paint();
+      verify();
+      return true;
+    });
     root.querySelector("#pc-ways").addEventListener("click", e => { const b = e.target.closest("[data-pc-way]"); if(b) setMode(b.dataset.pcWay); });
     root.querySelector("#pc-foot").addEventListener("click", e => {
       if(e.target.closest("#pc-resend")) send();
@@ -1867,10 +1982,27 @@ const AuthModule = (function(){
     setStep(0);
   }
 
+  function fillCode(code){
+    const form = document.getElementById("form-code");
+    if(!form || form.hidden || !codeEmail || document.getElementById("view-auth").style.display === "none") return false;
+    document.getElementById("fg-code").value = code;
+    if(form.requestSubmit) form.requestSubmit(); else document.getElementById("code-submit").click();
+    return true;
+  }
+  function rememberEmail(email){ try{ localStorage.setItem("srv-reset-email", JSON.stringify({ email, at: Date.now() })); }catch(_){} }
+  /** The email button was opened in a new tab: show the code step for that email and check the code. */
+  function resumeWithCode(email, code){
+    wireOnce();
+    showPanel("forgot");
+    showCodeStep(email);
+    return fillCode(code);
+  }
+
   let wired = false;
   function wireOnce(){
     if(wired) return;
     wired = true;
+    OtpLink.listen(fillCode);
     document.getElementById("yr").textContent = new Date().getFullYear();
 
     document.getElementById("form-code").addEventListener("submit", async (e) => {
@@ -1884,6 +2016,7 @@ const AuthModule = (function(){
       setLoading(btn, false, "Continue");
       if(error){ showErr("code-err", friendlyAuthError(error.message) || "This code is wrong or too old."); return; }
       clearInterval(resendTimer);
+      try{ localStorage.removeItem("srv-reset-email"); }catch(_){}
       showPanel("newpass");
       toast("Code accepted. Now choose a new password.", "success");
     });
@@ -1909,6 +2042,7 @@ const AuthModule = (function(){
       const recoveryRedirect = location.origin + location.pathname; const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: recoveryRedirect });
       setLoading(btn, false, "Send code");
       if(error){ showErr("forgot-err", friendlyAuthError(error.message) || "Could not send the code."); return; }
+      rememberEmail(email);
       showCodeStep(email);
       toast("We sent a code to your email.", "success");
     });
@@ -1973,7 +2107,7 @@ const AuthModule = (function(){
     showPanel(name);
   }
 
-  return { activate };
+  return { activate, resumeWithCode };
 })();
 
 /* ---------------- Module: LandingAuth (the sign-in/sign-up modal on the homepage) ---------------- */
@@ -6190,6 +6324,7 @@ async function boot(){
 
   window.addEventListener("hashchange", route);
   if(!recoveryHandled) await route();
+  OtpLink.deliver();
   if(linkResult === "confirmed" && AppState.profile) toast("Your email is confirmed. Welcome to Repuven!", "success");
   if(linkResult === "expired" && !AppState.session){ Router.go("auth/signin"); toast("This email link has expired or was already used. Please log in.", "error"); }
   if(AppState.session) Announce.schedule(1400);

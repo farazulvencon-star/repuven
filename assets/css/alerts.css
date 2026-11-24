@@ -39,3 +39,14 @@
 .pc-msg.is-bad{ display:block; padding:10px 12px 10px 38px; position:relative; border-radius:10px; background:var(--err-bg); border:1px solid var(--err-line); color:var(--err-fg) !important; font-size:13.5px; font-weight:600; text-align:left; }
 .pc-msg.is-bad::before{ content:"!"; position:absolute; left:11px; top:10px; width:18px; height:18px; border-radius:50%; background:#E5484D; color:#fff; font:800 12px/18px system-ui,sans-serif; text-align:center; }
 .pc-msg.is-bad:empty{ display:none; }
+
+/* "Click here" button from the code email: result card */
+.otp-link{ position:fixed; inset:0; z-index:10000; display:grid; place-items:center; padding:18px; background:rgba(5,6,5,.72); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); }
+.otp-link-card{ position:relative; width:min(380px,100%); padding:30px 24px 22px; border-radius:24px; background:#141514; border:1px solid rgba(255,255,255,.08); color:#C9CDC8; text-align:center; box-shadow:0 30px 80px rgba(0,0,0,.5); }
+.otp-link-card h3{ margin:0 0 8px; color:#F4F3EE; font-size:21px; letter-spacing:-.01em; }
+.otp-link-card p{ margin:0 0 20px; font-size:14.5px; line-height:1.55; }
+.otp-link-x{ position:absolute; top:12px; right:12px; width:34px; height:34px; display:grid; place-items:center; border:0; border-radius:10px; background:rgba(255,255,255,.06); color:inherit; cursor:pointer; }
+.otp-link-x .icon-glyph{ width:16px; height:16px; }
+.otp-link-code{ margin:14px 0 16px; padding:14px 10px; border-radius:14px; background:rgba(255,255,255,.05); font:600 30px/1 "DM Mono",ui-monospace,monospace; letter-spacing:.28em; color:#F4F3EE; user-select:all; }
+.otp-link-ok{ width:54px; height:54px; margin:0 auto 14px; display:grid; place-items:center; border-radius:50%; background:#9BE15D; color:#06120C; }
+.otp-link-ok .icon-glyph{ width:26px; height:26px; }
