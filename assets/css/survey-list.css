@@ -13,16 +13,9 @@
   .svx-card.is-open:hover{ transform:none; background:linear-gradient(0deg, rgba(244,243,238,.022), rgba(244,243,238,.022)), var(--surface); box-shadow:inset 0 0 0 1px var(--svx-hair-2); }
 }
 .svx-row{ display:grid; grid-template-columns:44px minmax(0,1fr); grid-template-areas:"ico body" "tray tray"; gap:14px; padding:16px; }
-/* Task icon tile: a colour per kind of task (place, review, video, app...) */
-.svx-ico{ --tone:#9BE15D; grid-area:ico; position:relative; display:grid; place-items:center; width:44px; height:44px; border-radius:13px; isolation:isolate; overflow:hidden;
-  color:var(--tone);
-  background:
-    radial-gradient(120% 90% at 30% 0%, color-mix(in srgb, var(--tone) 30%, transparent), transparent 70%),
-    linear-gradient(160deg, color-mix(in srgb, var(--tone) 16%, var(--surface-2)), color-mix(in srgb, var(--tone) 5%, var(--surface-2)));
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tone) 32%, transparent), inset 0 1px 0 color-mix(in srgb, #fff 14%, transparent), 0 6px 18px -8px color-mix(in srgb, var(--tone) 55%, transparent); }
-.svx-ico::after{ content:""; position:absolute; inset:auto -30% -55% -30%; height:70%; border-radius:50%; z-index:-1;
-  background:radial-gradient(closest-side, color-mix(in srgb, var(--tone) 28%, transparent), transparent); }
-.svx-ico .icon-glyph{ width:20px; height:20px; filter:drop-shadow(0 1px 6px color-mix(in srgb, var(--tone) 45%, transparent)); }
+/* Task icon: a plain tile with an icon (and icon colour) for the kind of task — no glow */
+.svx-ico{ --tone:var(--ink); grid-area:ico; display:grid; place-items:center; width:44px; height:44px; border-radius:13px; background:var(--surface-2); color:var(--tone); box-shadow:inset 0 0 0 1px var(--svx-hair); }
+.svx-ico .icon-glyph{ width:20px; height:20px; }
 .svx-ico.tone-map{ --tone:#FF7A59; }
 .svx-ico.tone-review{ --tone:#F5B93D; }
 .svx-ico.tone-video{ --tone:#FF5C7A; }
@@ -32,12 +25,7 @@
 .svx-ico.tone-web{ --tone:#2DD4D4; }
 .svx-ico.tone-shop{ --tone:#FB923C; }
 .svx-ico.tone-task{ --tone:#9BE15D; }
-.svx-card.is-featured .svx-ico{ width:52px; height:52px; border-radius:15px; }
-.svx-card.is-featured .svx-ico .icon-glyph{ width:24px; height:24px; }
-.svx-card.is-open:hover .svx-ico{ transform:translateY(-1px) rotate(-3deg); }
-.svx-ico{ transition:transform .25s cubic-bezier(.2,.8,.2,1); }
-.svx-card.is-done .svx-ico, .svx-card.is-capped .svx-ico{ filter:saturate(.35); opacity:.8; }
-@media (prefers-reduced-motion: reduce){ .svx-card.is-open:hover .svx-ico{ transform:none; } }
+.svx-card.is-done .svx-ico{ color:var(--muted); }
 .svx-card .svx-body{ grid-area:body; gap:6px; padding:0; }
 .svx-card .svx-meta{ flex-wrap:wrap; row-gap:6px; }
 .svx-pill{ display:inline-flex; align-items:center; gap:6px; height:22px; padding:0 9px; border-radius:999px; font-size:11px; font-weight:700; letter-spacing:.02em; white-space:nowrap; }
@@ -83,7 +71,6 @@
 
 /* ---------- loading rows ---------- */
 .svx-card.is-skel .svx-ico{ background:none; box-shadow:none; overflow:hidden; }
-.svx-card.is-skel .svx-ico::after{ display:none; }
 .svx-card.is-skel .svx-ico .svx-shim{ width:100%; height:100%; border-radius:inherit; }
 
 /* ---------- the task sheet: a plain header instead of a picture ---------- */
