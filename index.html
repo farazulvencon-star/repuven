@@ -16,6 +16,33 @@
 <meta property="og:url" content="https://www.repuven.com/">
 <link rel="canonical" href="https://www.repuven.com/">
 <script>document.documentElement.classList.add("js")</script>
+<script>
+/* A saved login means this reload belongs to a signed-in member: keep the landing / login
+   screen hidden while the app loads, so a reload goes straight back to the same page
+   instead of flashing the login page first. The app removes this class once it has
+   decided which screen to show (and a timer removes it if anything goes wrong). */
+(function(){
+  try{
+    var s = JSON.parse(localStorage.getItem("sb-dybotlvvfiqlouzvhvkg-auth-token") || "null");
+    var h = location.hash || "", q = location.search || "";
+    var callback = /access_token=|type=recovery|type=signup|error=/.test(h) || /[?&](code|type)=/.test(q);
+    if(s && s.refresh_token && !callback){
+      var d = document.documentElement;
+      d.classList.add("srv-resume");
+      setTimeout(function(){ d.classList.remove("srv-resume"); }, 12000);
+    }
+  }catch(e){}
+})();
+</script>
+<style>
+html.srv-resume #view-landing, html.srv-resume #view-auth, html.srv-resume #authModal{ display:none !important; }
+html.srv-resume body::after{
+  content:""; position:fixed; left:50%; top:50%; width:34px; height:34px; margin:-17px 0 0 -17px;
+  border-radius:50%; border:3px solid rgba(255,255,255,.14); border-top-color:#9BE15D;
+  animation:srv-resume-spin .8s linear infinite; z-index:9999;
+}
+@keyframes srv-resume-spin{ to{ transform:rotate(360deg); } }
+</style>
 
 <!-- Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1862,6 +1889,7 @@
   </section>
 </div>
 </div>
+    </div><!-- /.app-content-outer -->
 
   </main>
 </div>

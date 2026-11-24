@@ -84,24 +84,35 @@
       return { data: json, error: null };
     }
 
+    let refreshing = null;
     async function ensureFreshSession(){
       // The site and its Team page share one login: always take the newest token another copy saved.
       const stored = readStored();
       if(stored && (!session || (stored.expires_at || 0) > (session.expires_at || 0))) session = stored;
       if(session && session.expires_at && session.expires_at * 1000 < Date.now() + 60000){
-        const used = session.refresh_token;
-        const { data, error } = await authRequest("/token?grant_type=refresh_token", {
-          method: "POST", body: JSON.stringify({ refresh_token: used })
-        });
-        if(!error && data && data.access_token){
-          persist(normalize(data));
-        } else {
-          const again = readStored();   // the other copy may have refreshed first
-          if(again && again.refresh_token !== used && (again.expires_at || 0) * 1000 > Date.now()) session = again;
-          else persist(null);
-        }
+        // Many requests start at once (profile + roles + wallet...). Refresh only once and let
+        // every caller wait for that one refresh, so a rotated refresh token is never reused.
+        if(!refreshing) refreshing = refreshNow().finally(() => { refreshing = null; });
+        await refreshing;
       }
       return session;
+    }
+    async function refreshNow(){
+      const used = session && session.refresh_token;
+      if(!used) return;
+      const { data, error } = await authRequest("/token?grant_type=refresh_token", {
+        method: "POST", body: JSON.stringify({ refresh_token: used })
+      });
+      if(!error && data && data.access_token){
+        persist(normalize(data));
+        return;
+      }
+      const again = readStored();   // the other copy may have refreshed first
+      if(again && again.refresh_token !== used && (again.expires_at || 0) * 1000 > Date.now()){ session = again; return; }
+      // Only a real "this login is no longer valid" answer signs the person out.
+      // A network drop or a server hiccup keeps the saved login, so a slow connection
+      // during a reload no longer throws the member back to the login page.
+      if(error && (error.status === 400 || error.status === 401 || error.status === 403)) persist(null);
     }
 
     function init(){

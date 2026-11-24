@@ -1520,7 +1520,6 @@ const PAGE_META = {
   mailbox:   { title:"Mailbox",      sub:"Notices and messages from Repuven" },
   support:   { title:"Support Chat", sub:"Private chat with Repuven support" },
   livechat:  { title:"Live Chat", sub:"Group chat at set times" },
-  leaderboard: { title:"Leaderboard", sub:"Top verified referral members" },
   leaderboard:{ title:"Leaderboard", sub:"Top members by verified referrals" },
   admin:     { title:"Admin Panel",  sub:"Manage Repuven" },
   team:      { title:"Team",         sub:"Your work as a supportive admin" },
@@ -1640,7 +1639,9 @@ function restorePageScroll(){
   document.documentElement.style.overflow = "";
 }
 
+function srvResumeDone(){ document.documentElement.classList.remove("srv-resume"); }
 function showTopLevel(which){
+  srvResumeDone();
   document.getElementById("view-landing").style.display = which === "landing" ? "" : "none";
   document.getElementById("view-auth").style.display = which === "auth" ? "" : "none";
   document.getElementById("view-app").style.display = which === "app" ? "" : "none";
@@ -1680,6 +1681,7 @@ function showPageSection(key, sub, params){
 async function route(){
   if(isAuthCallbackHash()) return; // supabase-js + onAuthStateChange own this; don't reroute mid-callback
   const { page, sub, params } = parseHash();
+  srvResumeDone();
   if(DocPages.handle(page)) return;   // #privacy, #terms, #help
 
   if(!AppState.session){
@@ -2758,7 +2760,9 @@ const LandingAuth = (function(){
     modal.setAttribute("aria-hidden","true");
     restorePageScroll();
     showMessage("","");
-    history.replaceState(null, "", location.pathname + location.search);
+    // only drop the #auth/... address of the form itself; any other page address stays,
+    // so closing the form (or the router tidying up) never loses the page being opened
+    if(/^#auth(\/|\?|$)/.test(location.hash || "")) history.replaceState(null, "", location.pathname + location.search);
   }
 
   async function checkRef(){
@@ -6218,4 +6222,4 @@ boot();
 } // end of runApp()
 
 /* ---------------- entry point ---------------- */
-runApp().then(() => { try{ sessionStorage.removeItem("srv-reload"); }catch(_){} }).catch((e) => { console.error("Repuven: runApp() crashed —", e); window.__srvAppFailed = true; showFatalLoadError(); });
+runApp().then(() => { try{ sessionStorage.removeItem("srv-reload"); }catch(_){} }).catch((e) => { document.documentElement.classList.remove("srv-resume"); console.error("Repuven: runApp() crashed —", e); window.__srvAppFailed = true; showFatalLoadError(); });
