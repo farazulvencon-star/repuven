@@ -1670,7 +1670,7 @@ Modules.team = (function(){
     if(!window.SRV_TEAM_PACK){
       await new Promise((resolve, reject) => {
         const s = document.createElement("script");
-        s.src = "assets/js/team-tools.js?v=20261124b"; s.onload = resolve; s.onerror = reject;
+        s.src = "assets/js/team-tools.js?v=20261124c"; s.onload = resolve; s.onerror = reject;
         document.head.appendChild(s);
       });
     }
@@ -5949,10 +5949,12 @@ async function loadLeaderboard(){
     podium.innerHTML = [0, 1, 2].map(() => '<div class="skel" style="height:190px;border-radius:20px;"></div>').join("");
     list.innerHTML = '<div class="skel" style="height:300px;border-radius:20px;"></div>';
   }
-  const [lb, cp] = await Promise.all([
-    supabase.rpc("get_referral_leaderboard_v2", { p_limit: 10 }),
+  // v3 also sends each member's profile photo; v2 is the older list without photos
+  let [lb, cp] = await Promise.all([
+    supabase.rpc("get_referral_leaderboard_v3", { p_limit: 10 }),
     supabase.rpc("get_public_referral_prize_campaign")
   ]);
+  if(lb.error) lb = await supabase.rpc("get_referral_leaderboard_v2", { p_limit: 10 });
   if(lb.error){
     podium.innerHTML = "";
     list.innerHTML = `<div class="lb-error">We couldn't load the leaderboard. Please try again in a moment.</div>`;
@@ -5996,7 +5998,7 @@ async function loadLeaderboard(){
   podium.innerHTML = [1, 0, 2].map(i => {
     const r = places[i], prize = prizeFor(i);
     if(!r) return `<article class="lb-top r${i + 1} is-open"><span class="lb-rank"><i class="lb-medal r${i + 1}">${i + 1}</i></span><span class="ck-ava">?</span><span class="lb-who-copy"><b>Open spot</b><small>Invite people to take it</small></span>${prize ? `<span class="lb-prize-chip">Prize ${money(prize)}</span>` : ""}</article>`;
-    return `<article class="lb-top r${i + 1}"><span class="lb-rank"><i class="lb-medal r${i + 1}">${i + 1}</i></span>${ChatKit.avatar({ name: r.full_name || "Partner" })}<span class="lb-who-copy"><b>${escapeHtml(r.full_name || "Partner")}${Leadership.chip(r.leader_level)}</b><small>${n(r.qualified_referrals)} verified · ${n(r.total_referrals)} invited</small></span><span class="lb-earn">${money(n(r.referral_earnings))}<em>earned</em></span>${prize ? `<span class="lb-prize-chip">Prize ${money(prize)}</span>` : ""}</article>`;
+    return `<article class="lb-top r${i + 1}"><span class="lb-rank"><i class="lb-medal r${i + 1}">${i + 1}</i></span>${ChatKit.avatar({ name: r.full_name || "Partner", url: r.avatar_url || "" })}<span class="lb-who-copy"><b>${escapeHtml(r.full_name || "Partner")}${Leadership.chip(r.leader_level)}</b><small>${n(r.qualified_referrals)} verified · ${n(r.total_referrals)} invited</small></span><span class="lb-earn">${money(n(r.referral_earnings))}<em>earned</em></span>${prize ? `<span class="lb-prize-chip">Prize ${money(prize)}</span>` : ""}</article>`;
   }).join("");
 
   // places 4 to 10
@@ -6004,7 +6006,7 @@ async function loadLeaderboard(){
     + places.slice(3).map((r, k) => {
       const rank = k + 4;
       if(!r) return `<div class="lb-row is-open"><span class="lb-n">${rank}</span><span class="lb-who"><span class="ck-ava ck-ava-sm">?</span><b>Open spot</b></span><span class="lb-num lb-col-hide">—</span><span class="lb-num lb-col-hide">—</span><span class="lb-num">—</span></div>`;
-      return `<div class="lb-row"><span class="lb-n">${rank}</span><span class="lb-who">${ChatKit.avatar({ name: r.full_name || "Partner", size: "sm" })}<b>${escapeHtml(r.full_name || "Partner")}${Leadership.chip(r.leader_level)}</b></span><span class="lb-num lb-col-hide">${n(r.qualified_referrals)}</span><span class="lb-num lb-col-hide">${n(r.total_referrals)}</span><span class="lb-num is-money">${money(n(r.referral_earnings))}</span></div>`;
+      return `<div class="lb-row"><span class="lb-n">${rank}</span><span class="lb-who">${ChatKit.avatar({ name: r.full_name || "Partner", size: "sm", url: r.avatar_url || "" })}<b>${escapeHtml(r.full_name || "Partner")}${Leadership.chip(r.leader_level)}</b></span><span class="lb-num lb-col-hide">${n(r.qualified_referrals)}</span><span class="lb-num lb-col-hide">${n(r.total_referrals)}</span><span class="lb-num is-money">${money(n(r.referral_earnings))}</span></div>`;
     }).join("");
   podium.dataset.loaded = "1";
 }
