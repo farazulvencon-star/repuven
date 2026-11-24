@@ -1,19 +1,43 @@
-<!-- Repuven email template. Paste into Supabase: Authentication > Emails > Templates. -->
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#0B0C0B;padding:32px 12px;font-family:Arial,Helvetica,sans-serif;">
+<!-- Repuven email template (Magic Link — payment & security code).
+     Paste into Supabase: Authentication > Emails > Templates. -->
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#EEEFF2;padding:28px 12px;font-family:'Hind Siliguri','Noto Sans Bengali','Segoe UI',Arial,sans-serif;">
   <tr><td align="center">
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:440px;background:#141514;border-radius:20px;padding:32px 26px;">
-      <tr><td align="center" style="padding-bottom:18px;">
-        <img src="https://www.repuven.com/email-logo.png" width="48" height="48" alt="Repuven" style="display:block;border:0;border-radius:12px;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:325px;background:#0E0F11;border-radius:10px;">
+      <!-- header -->
+      <tr><td style="padding:16px 18px 12px 18px;">
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
+          <td valign="middle"><img src="https://www.repuven.com/email-logo.png" width="24" height="24" alt="R" style="display:block;border:0;border-radius:6px;"></td>
+          <td valign="middle" style="padding-left:8px;color:#FFFFFF;font-family:Georgia,'Times New Roman',serif;font-size:13px;font-weight:bold;letter-spacing:.5px;">Repuven</td>
+        </tr></table>
       </td></tr>
-      <tr><td align="center" style="color:#F4F3EE;font-size:22px;font-weight:bold;padding-bottom:10px;">Your Repuven code</td></tr>
-      <tr><td align="center" style="color:#C9CDC8;font-size:15px;line-height:22px;padding-bottom:22px;">Use this code to confirm it's you.</td></tr>
-      <tr><td align="center" style="padding-bottom:22px;">
-        <div style="display:inline-block;background:#1F201F;border-radius:12px;padding:14px 22px;color:#F4F3EE;font-size:30px;font-weight:bold;letter-spacing:8px;font-family:'Courier New',monospace;">{{ .Token }}</div>
+      <!-- progress line -->
+      <tr><td style="padding:0 18px;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+          <td width="30%" height="2" style="background:#22C55E;font-size:0;line-height:0;">&nbsp;</td>
+          <td width="70%" height="2" style="background:#2A2C30;font-size:0;line-height:0;">&nbsp;</td>
+        </tr></table>
       </td></tr>
-      <tr><td align="center" style="padding-bottom:22px;">
-        <a href="https://www.repuven.com/?otp={{ .Token }}" target="_blank" style="display:inline-block;background:#9BE15D;color:#06120C;font-size:16px;font-weight:bold;text-decoration:none;padding:14px 34px;border-radius:12px;">Click here</a>
+      <!-- body -->
+      <tr><td style="padding:16px 18px 0 18px;">
+        <div style="color:#9CA3AF;font-size:10px;line-height:14px;">নিরাপত্তা যাচাই</div>
+        <div style="color:#FFFFFF;font-size:17px;line-height:24px;font-weight:bold;padding:2px 0 8px 0;">আপনার যাচাই কোড</div>
+        <div style="color:#D1D5DB;font-size:11px;line-height:17px;">পেমেন্ট বা নিরাপত্তা সেটিং নিশ্চিত করতে এই কোড দরকার। নিচের বোতামে ক্লিক করুন, কোডটি Repuven পাতায় নিজে থেকেই বসে যাবে।</div>
       </td></tr>
-      <tr><td align="center" style="color:#8C918B;font-size:13px;line-height:20px;">Click the button and the code is filled in for you on your open Repuven page.<br>The code works for a short time only. If you didn't ask for it, ignore this email.<br>Never share this code. Our team will never ask for it.</td></tr>
+      <!-- code -->
+      <tr><td align="center" style="padding:20px 18px 12px 18px;">
+        <div style="display:inline-block;border:1px solid #22C55E;border-radius:6px;padding:16px 18px;color:#22C55E;font-family:'Courier New',Courier,monospace;font-size:19px;font-weight:bold;letter-spacing:6px;">{{ .Token }}</div>
+      </td></tr>
+      <!-- button -->
+      <tr><td align="center" style="padding:0 18px 8px 18px;">
+        <a href="https://www.repuven.com/?otp={{ .Token }}" target="_blank" style="display:inline-block;background:#22C55E;color:#06120C;font-size:11px;font-weight:bold;text-decoration:none;padding:9px 18px;border-radius:4px;">এখানে ক্লিক করুন</a>
+      </td></tr>
+      <tr><td align="center" style="padding:0 18px 16px 18px;color:#D1D5DB;font-size:9px;line-height:14px;">বোতাম কাজ না করলে কোডটি চেপে ধরে কপি করুন। কোডটি অল্প সময়ের জন্য কাজ করবে।</td></tr>
+      <tr><td style="padding:0 18px 16px 18px;color:#D1D5DB;font-size:10px;line-height:16px;">আপনি এই কোড না চেয়ে থাকলে এই ইমেইলটি উপেক্ষা করুন এবং আপনার পাসওয়ার্ড বদলে ফেলুন।</td></tr>
+      <!-- footer -->
+      <tr><td style="border-top:1px solid #23252A;padding:12px 18px 14px 18px;color:#6B7280;font-size:8.5px;line-height:13px;">
+        এই ইমেইলটি <a href="mailto:{{ .Email }}" style="color:#3B82F6;">{{ .Email }}</a> ঠিকানায় পাঠানো হয়েছে। কোডটি কাউকে জানাবেন না — Repuven-এর কেউ কখনো আপনার কাছে এই কোড চাইবে না।
+      </td></tr>
     </table>
+    <div style="padding-top:8px;color:#6B7280;font-size:8.5px;font-family:'Hind Siliguri','Noto Sans Bengali','Segoe UI',Arial,sans-serif;">Repuven · আপনার কাজ, আপনার মূল্য</div>
   </td></tr>
 </table>
