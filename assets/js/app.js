@@ -3446,16 +3446,40 @@ Modules.products = (function(){
     toast(`You have completed ${quota ? quota.limit : 7} tasks today. New tasks open again in ${untilReset() || "a few hours"}.`, "error");
   }
 
-  function iconOf(t){
+  // Each task gets an icon and a colour that match what the member will do.
+  // The link (Google Maps, YouTube, Play Store...) decides first, then the words in the task.
+  const KINDS = {
+    map:    { icon:"i-pin",       tone:"map",    label:"Place" },
+    review: { icon:"i-star",      tone:"review", label:"Review" },
+    video:  { icon:"i-play",      tone:"video",  label:"Video" },
+    app:    { icon:"i-download",  tone:"app",    label:"App" },
+    survey: { icon:"i-clipboard", tone:"survey", label:"Survey" },
+    social: { icon:"i-heart",     tone:"social", label:"Social" },
+    web:    { icon:"i-globe",     tone:"web",    label:"Website" },
+    shop:   { icon:"i-bag",       tone:"shop",   label:"Shop" },
+    task:   { icon:"i-target",    tone:"task",   label:"Task" }
+  };
+  function kindOf(t){
+    const host = hostOf(safeUrl(t.target_url));
+    if(host === "Google Maps") return KINDS.map;
+    if(host === "YouTube" || host === "TikTok") return KINDS.video;
+    if(host === "Google Play" || host === "App Store") return KINDS.app;
+    if(host === "Google Forms") return KINDS.survey;
+    if(host === "Trustpilot") return KINDS.review;
+    if(["Facebook","Instagram","X","Telegram"].includes(host)) return KINDS.social;
     const s = ((t.title || "") + " " + (t.description || "")).toLowerCase();
-    if(/\b(video|youtube|watch|reels?|shorts)\b/.test(s)) return "i-play";
-    if(/\b(review|reviews|rate|rating|stars?|feedback)\b/.test(s)) return "i-star";
-    if(/\b(apps?|play store|app store|install|download|apk)\b/.test(s)) return "i-download";
-    if(/\b(survey|surveys|questions?|form|quiz|poll)\b/.test(s)) return "i-clipboard";
-    if(/\b(website|site|web|visit|browse|page|test|testing)\b/.test(s)) return "i-globe";
-    if(/\b(shop|store|product|buy|order)\b/.test(s)) return "i-bag";
-    return "i-sparkle";
+    if(/\b(maps?|location|place|directions?|business page)\b/.test(s)) return KINDS.map;
+    if(/\b(video|youtube|watch|reels?|shorts)\b/.test(s)) return KINDS.video;
+    if(/\b(review|reviews|rate|rating|stars?|feedback)\b/.test(s)) return KINDS.review;
+    if(/\b(apps?|play store|app store|install|download|apk)\b/.test(s)) return KINDS.app;
+    if(/\b(survey|surveys|questions?|form|quiz|poll)\b/.test(s)) return KINDS.survey;
+    if(/\b(follow|like|likes|share|comment|subscribe|join|group|channel|page)\b/.test(s)) return KINDS.social;
+    if(/\b(website|site|web|visit|browse|test|testing|sign ?up|register)\b/.test(s)) return KINDS.web;
+    if(/\b(shop|store|product|buy|order)\b/.test(s)) return KINDS.shop;
+    if(host) return KINDS.web;
+    return KINDS.task;
   }
+  function iconOf(t){ return kindOf(t).icon; }
 
   // Only real web links are shown or opened (a link without https:// still works).
   function safeUrl(url){
@@ -3514,7 +3538,7 @@ Modules.products = (function(){
     return `<p class="svx-brief-p">${linkify(escapeHtml(raw))}</p>`;
   }
 
-  function icoHtml(t){ return `<span class="svx-ico" aria-hidden="true">${ICON(iconOf(t))}</span>`; }
+  function icoHtml(t){ const k = kindOf(t); return `<span class="svx-ico tone-${k.tone}" aria-hidden="true" title="${k.label}">${ICON(k.icon)}</span>`; }
   function pillsHtml(t, sub){
     if(sub) return "";
     let h = "";
@@ -3859,7 +3883,7 @@ Modules.products = (function(){
       }else qEl.hidden = true;
     }
 
-    document.getElementById("sm-media").innerHTML = ICON(iconOf(t));
+    { const k = kindOf(t), m = document.getElementById("sm-media"); m.className = "svx-ico tone-" + k.tone; m.innerHTML = ICON(k.icon); }
     document.getElementById("sm-flags").innerHTML = pillsHtml(t, null);
     document.getElementById("sm-meta").innerHTML = metaHtml(t, true);
     document.getElementById("sm-title").textContent = t.title;
