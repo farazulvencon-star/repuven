@@ -1,7 +1,7 @@
 /* ---------- Leadership: badges, the leadership card, the new-level pop-up ---------- */
 .ldr-badge{ display:inline-block; flex:none; width:18px; height:18px; vertical-align:-3px; overflow:visible; }
 .ldr-badge.is-locked{ filter:grayscale(1) brightness(.55); opacity:.55; }
-.ldr-badge-sm{ width:18px; height:18px; vertical-align:-3px; }
+.ldr-badge-sm{ width:18px; height:18px; vertical-align:-3px; --ldr-fire-scale:.72; }
 
 .ldr{ --ldr-tint:rgba(244,243,238,.05); --ldr-ink:var(--muted); position:relative; overflow:hidden; padding:24px !important; }
 .ldr[data-level="1"], .ldr-pop[data-level="1"], .ldr-mail[data-level="1"]{ --ldr-tint:rgba(194,124,71,.17); --ldr-ink:#E9A97A; }
