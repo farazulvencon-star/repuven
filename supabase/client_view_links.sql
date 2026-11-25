@@ -1,5 +1,6 @@
--- Client view links: an admin makes a link, a client opens it and sees (read-only, no account)
--- how many tasks there are and how much work members have done. Only adds new things.
+-- Client view link: ONE link that the admin makes in the admin panel. Anyone who has it can open
+-- a read-only page (no account) that shows how many tasks there are and how much work members
+-- have done. Making a new link turns the old one off. Only adds new things.
 
 create table if not exists public.client_view_links (
   id uuid primary key default gen_random_uuid(),
@@ -25,6 +26,8 @@ begin
   if not public.has_any_role(array['ADMIN'::public.app_role,'SUPER_ADMIN'::public.app_role]) then
     raise exception 'Not authorized';
   end if;
+  -- there is only one client link: a new one replaces the old one
+  update public.client_view_links set removed_at = now(), is_active = false where removed_at is null;
   loop
     v_bytes := extensions.gen_random_bytes(16);
     v_token := '';
