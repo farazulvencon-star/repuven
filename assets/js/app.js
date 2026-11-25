@@ -1945,9 +1945,8 @@ const ClientView = (function(){
         </div>
         <div class="svx-sum cv-sum">
           <div><span>Live tasks</span><b>${num(st.live_tasks)}</b></div>
-          <div><span>Tasks completed</span><b class="is-money">${num(st.completed)}</b></div>
+          <div><span>Total rewards</span><b class="is-money">${money(allTasks.reduce((a, t) => a + Number(t.reward || 0), 0))}</b></div>
           <div><span>Being checked</span><b>${num(st.in_review)}</b></div>
-          <div><span>Completed today</span><b>${num(st.completed_today)}</b></div>
         </div>
         <div class="products-grid svx-grid" id="cv-grid"></div>
       </div>`;
@@ -3739,10 +3738,10 @@ Modules.products = (function(){
     return `<div class="svx-review">${ICON("i-clock")}<span>${txt}</span></div>`;
   }
   /* Client view (#client/TOKEN): the same task cards members see, but read only.
-     No start button, no click: the right side shows how many times the task was done instead. */
+     No start button, no click, and no count of finished work. */
   function viewTray(t){
-    const done = Number(t.completed || 0), checking = Number(t.in_review || 0);
-    return `<span class="svx-status is-ok">${ICON("i-check")}${done.toLocaleString("en-US")} done</span>` +
+    const checking = Number(t.in_review || 0);
+    return `<span class="svx-status is-pending is-live"><i></i>Live</span>` +
       (checking ? `<span class="svx-view-sub">${checking.toLocaleString("en-US")} being checked</span>` : "");
   }
   function viewCardHtml(t, i, featured){

@@ -75,7 +75,7 @@ begin
   update public.client_view_links set removed_at = now(), is_active = false where id = p_link and removed_at is null;
 end $$;
 
--- What a client sees. Only totals and task titles: no member names, emails, links or money balances.
+-- What a client sees: the live Survey tasks, read only. No finished-work counts, member names, emails or money balances.
 create or replace function public.get_client_view(p_token text)
 returns jsonb language plpgsql security definer set search_path to 'public' as $$
 declare
@@ -92,39 +92,20 @@ begin
     'valid', true,
     'label', v.label,
     'generated_at', now(),
-    'stats', (select jsonb_build_object(
-        'live_tasks',      (select count(*) from public.survey_tasks t where t.status = 'PUBLISHED' and t.removed_at is null),
-        'tasks_total',     (select count(*) from public.survey_tasks t where t.status = 'PUBLISHED' or t.removed_at is not null),
-        'completed',       (select count(*) from public.survey_submissions s where s.status = 'APPROVED'),
-        'in_review',       (select count(*) from public.survey_submissions s where s.status = 'PENDING'),
-        'submitted',       (select count(*) from public.survey_submissions s),
-        'workers',         (select count(distinct s.user_id) from public.survey_submissions s where s.status = 'APPROVED'),
-        'members',         (select count(*) from public.profiles p where not coalesce(p.is_banned, false)),
-        'verified_members',(select count(*) from public.profiles p where p.is_verified and not coalesce(p.is_banned, false)),
-        'paid_to_workers', (select coalesce(sum(s.reward), 0) from public.survey_submissions s where s.status = 'APPROVED'),
-        'completed_7d',    (select count(*) from public.survey_submissions s where s.status = 'APPROVED' and coalesce(s.reviewed_at, s.submitted_at) >= now() - interval '7 days'),
-        'completed_today', (select count(*) from public.survey_submissions s where s.status = 'APPROVED' and coalesce(s.reviewed_at, s.submitted_at) >= date_trunc('day', now() at time zone 'Asia/Dhaka') at time zone 'Asia/Dhaka')
-      )),
-    'daily', (select coalesce(jsonb_agg(jsonb_build_object('day', d.day, 'completed', d.n) order by d.day), '[]'::jsonb) from (
-        select g.day::date as day,
-               (select count(*) from public.survey_submissions s
-                 where s.status = 'APPROVED'
-                   and (coalesce(s.reviewed_at, s.submitted_at) at time zone 'Asia/Dhaka')::date = g.day::date) as n
-        from generate_series((now() at time zone 'Asia/Dhaka')::date - 29, (now() at time zone 'Asia/Dhaka')::date, interval '1 day') g(day)
-      ) d),
+    'stats', jsonb_build_object(
+        'live_tasks', (select count(*) from public.survey_tasks t where t.status = 'PUBLISHED' and t.removed_at is null),
+        'in_review',  (select count(*) from public.survey_submissions s where s.status = 'PENDING')
+      ),
     'tasks', (select coalesce(jsonb_agg(x order by x->>'created_at' desc), '[]'::jsonb) from (
         select jsonb_build_object(
           'title', t.title,
           'description', t.description,
           'target_url', substring(t.target_url from '^[^?#]*'),
-          'platform', lower(substring(t.target_url from '^[a-zA-Z]+://(?:www\.)?([^/:?#]+)')),
           'reward', t.reward,
           'limited', t.budget is not null,
           'steps', (select count(*) from regexp_split_to_table(coalesce(t.instructions, ''), E'\n') l where btrim(l) <> ''),
           'sector', ws.name,
           'created_at', t.created_at,
-          'live', t.status = 'PUBLISHED' and t.removed_at is null,
-          'completed', (select count(*) from public.survey_submissions s where s.task_id = t.id and s.status = 'APPROVED'),
           'in_review', (select count(*) from public.survey_submissions s where s.task_id = t.id and s.status = 'PENDING')
         ) as x
         from public.survey_tasks t
@@ -132,19 +113,7 @@ begin
         where t.status = 'PUBLISHED' and t.removed_at is null
         order by t.created_at desc
         limit 500
-      ) q),
-    'recent', (select coalesce(jsonb_agg(r order by r->>'at' desc), '[]'::jsonb) from (
-        select jsonb_build_object(
-          'task', t.title,
-          'member', 'Member #' || upper(substr(md5(s.user_id::text), 1, 4)),
-          'at', coalesce(s.reviewed_at, s.submitted_at)
-        ) as r
-        from public.survey_submissions s
-        join public.survey_tasks t on t.id = s.task_id
-        where s.status = 'APPROVED'
-        order by coalesce(s.reviewed_at, s.submitted_at) desc
-        limit 20
-      ) q2)
+      ) q)
   );
 end $$;
 
