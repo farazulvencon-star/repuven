@@ -1670,7 +1670,7 @@ Modules.team = (function(){
     if(!window.SRV_TEAM_PACK){
       await new Promise((resolve, reject) => {
         const s = document.createElement("script");
-        s.src = "assets/js/team-tools.js?v=20261124f"; s.onload = resolve; s.onerror = reject;
+        s.src = "assets/js/team-tools.js?v=20261125a"; s.onload = resolve; s.onerror = reject;
         document.head.appendChild(s);
       });
     }
@@ -1797,6 +1797,7 @@ async function route(){
   if(isAuthCallbackHash()) return; // supabase-js + onAuthStateChange own this; don't reroute mid-callback
   const { page, sub, params } = parseHash();
   srvResumeDone();
+  if(ClientView.handle(page, sub)) return;   // #client/TOKEN: read-only page for clients, no account
   if(DocPages.handle(page)) return;   // #privacy, #terms, #help
 
   if(!AppState.session){
@@ -1903,6 +1904,173 @@ const DocPages = (function(){
   }
 
   return { handle, close };
+})();
+
+/* ---------------- Client view: read-only page for clients (#client/TOKEN) ----------------
+   The admin makes the link in the admin panel (Client links). Anyone with the link sees how many
+   tasks there are and how much work members have done. No account, nothing can be changed,
+   and no member names or details are shown. */
+const ClientView = (function(){
+  const view = document.getElementById("view-client");
+  const main = document.getElementById("cv-main");
+  const baseTitle = document.title;
+  let open = false, token = "", busy = false;
+
+  const num = n => Number(n || 0).toLocaleString("en-US");
+  const ICO = {
+    tasks: '<path d="M9 5h10M9 12h10M9 19h10"/><path d="m3.5 5 1.2 1.2L7 4M3.5 12l1.2 1.2L7 11M3.5 19l1.2 1.2L7 18"/>',
+    done: '<circle cx="12" cy="12" r="9"/><path d="m8 12.3 2.7 2.7L16.5 9"/>',
+    people: '<circle cx="9" cy="8" r="3.2"/><path d="M3 19c.5-3.4 3-5.6 6-5.6s5.5 2.2 6 5.6"/><path d="M16 5a3 3 0 0 1 0 6M17.5 13.6c1.9.8 3 2.6 3.4 5.4"/>',
+    review: '<circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/>',
+    week: '<rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/>',
+    paid: '<rect x="3" y="6" width="18" height="12" rx="2.5"/><circle cx="12" cy="12" r="2.6"/><path d="M6.5 9.5v5M17.5 9.5v5"/>',
+    refresh: '<path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 5v6h-6"/>'
+  };
+  const svg = (k) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${ICO[k]}</svg>`;
+
+  function platformName(host, title){
+    const h = String(host || "").toLowerCase();
+    const t = String(title || "").toLowerCase();
+    if(/(^|\.)maps\.app\.goo\.gl$|goo\.gl$/.test(h) || (h.endsWith("google.com") && /map|review|place/.test(t))) return "Google Maps";
+    const map = { "google.com":"Google", "youtube.com":"YouTube", "youtu.be":"YouTube", "play.google.com":"Google Play", "apps.apple.com":"App Store",
+      "facebook.com":"Facebook", "fb.com":"Facebook", "instagram.com":"Instagram", "tiktok.com":"TikTok", "x.com":"X", "twitter.com":"X",
+      "t.me":"Telegram", "trustpilot.com":"Trustpilot", "forms.gle":"Google Forms", "docs.google.com":"Google Forms" };
+    if(map[h]) return map[h];
+    return h ? h.replace(/^m\./, "") : "Online task";
+  }
+  function ago(v){
+    const t = new Date(v).getTime(); if(!t) return "";
+    const s = Math.max(0, (Date.now() - t) / 1000);
+    if(s < 60) return "just now";
+    if(s < 3600) return Math.floor(s / 60) + " min ago";
+    if(s < 86400) return Math.floor(s / 3600) + " h ago";
+    const d = Math.floor(s / 86400);
+    return d === 1 ? "yesterday" : d + " days ago";
+  }
+  const dayLabel = d => { const m = String(d || "").match(/^(\d{4})-(\d{2})-(\d{2})/); return m ? new Date(+m[1], +m[2]-1, +m[3]).toLocaleDateString("en-US", { day:"numeric", month:"short" }) : ""; };
+
+  function stat(icon, label, value, sub, main){
+    return `<div class="cv-stat${main ? " is-main" : ""}"><div class="cv-stat-label">${svg(icon)}${label}</div><div class="cv-stat-value">${value}</div>${sub ? `<div class="cv-stat-sub">${sub}</div>` : ""}</div>`;
+  }
+
+  function render(d){
+    const st = d.stats || {};
+    const daily = Array.isArray(d.daily) ? d.daily : [];
+    const tasks = Array.isArray(d.tasks) ? d.tasks : [];
+    const recent = Array.isArray(d.recent) ? d.recent : [];
+    const max = Math.max(1, ...daily.map(x => Number(x.completed || 0)));
+    const sum30 = daily.reduce((a, x) => a + Number(x.completed || 0), 0);
+    const shown = tasks.slice(0, 12);
+    main.innerHTML = `
+      <section class="cv-hero">
+        <p class="cv-kicker">How we work</p>
+        <h1 id="cv-title">Real people, real work, checked by our team</h1>
+        <p>Repuven posts online tasks such as reviews, app feedback and short surveys. Members do each task and send proof. Our team checks every proof by hand, and only approved work is paid. Below you can see the live numbers.</p>
+        <div class="cv-meta">
+          ${d.label ? `<span>Prepared for <span class="cv-for">${escapeHtml(d.label)}</span></span>` : ""}
+          <span>Updated ${escapeHtml(new Date(d.generated_at || Date.now()).toLocaleString("en-US", { day:"numeric", month:"short", hour:"numeric", minute:"2-digit" }))}</span>
+          <button class="cv-btn" type="button" id="cv-refresh">${svg("refresh")}Refresh</button>
+        </div>
+      </section>
+
+      <div class="cv-stats">
+        ${stat("done", "Tasks completed", num(st.completed), `${num(st.completed_7d)} in the last 7 days`, true)}
+        ${stat("tasks", "Live tasks now", num(st.live_tasks), "Open for members to do")}
+        ${stat("people", "Members who did work", num(st.workers), `${num(st.verified_members)} verified members in total`)}
+        ${stat("review", "Being checked now", num(st.in_review), "Proofs waiting for our team")}
+        ${stat("week", "Completed today", num(st.completed_today), "Bangladesh time")}
+        ${stat("paid", "Paid to members", money(st.paid_to_workers), "For approved work only")}
+      </div>
+
+      <section class="cv-card">
+        <div class="cv-card-head"><h2>Work completed, last 30 days</h2><span>${num(sum30)} approved tasks</span></div>
+        <div class="cv-chart" role="img" aria-label="Approved tasks per day for the last 30 days">
+          ${daily.map(x => { const n = Number(x.completed || 0); return `<div class="cv-bar"><i style="height:${Math.max(1, Math.round(n / max * 100))}%"></i><b>${dayLabel(x.day)}: ${num(n)}</b></div>`; }).join("")}
+        </div>
+        <div class="cv-axis"><span>${dayLabel(daily[0] && daily[0].day)}</span><span>Today</span></div>
+      </section>
+
+      <section class="cv-card">
+        <div class="cv-card-head"><h2>How a task gets done</h2></div>
+        <div class="cv-steps">
+          <div class="cv-step"><h3>Task is posted</h3><p>We publish your task with clear steps and a link, so every member does it the same way.</p></div>
+          <div class="cv-step"><h3>Members do it</h3><p>Verified members open the link, do the work themselves and upload a screenshot as proof.</p></div>
+          <div class="cv-step"><h3>Our team checks</h3><p>Every proof is checked by a person. Copies, fakes and unfinished work are rejected.</p></div>
+          <div class="cv-step"><h3>Approved and paid</h3><p>Only approved work is counted and paid, so the numbers here are real, finished work.</p></div>
+        </div>
+      </section>
+
+      <div class="cv-grid2">
+        <section class="cv-card">
+          <div class="cv-card-head"><h2>Live tasks</h2><span>${num(st.live_tasks)} open</span></div>
+          ${shown.length ? `<div class="cv-tablewrap"><table class="cv-table">
+            <thead><tr><th>Task</th><th class="num">Done</th><th class="num hide-sm">Checking</th><th class="num hide-sm">Reward</th></tr></thead>
+            <tbody id="cv-task-rows">${rows(shown)}</tbody></table></div>
+            ${tasks.length > shown.length ? `<div class="cv-more"><button class="cv-btn" type="button" id="cv-more">Show all ${num(tasks.length)} tasks</button></div>` : ""}`
+          : '<div class="cv-empty">No live tasks right now.</div>'}
+        </section>
+        <section class="cv-card">
+          <div class="cv-card-head"><h2>Recently approved</h2></div>
+          ${recent.length ? `<ul class="cv-feed">${recent.map(r => `<li><span class="cv-feed-dot">${svg("done")}</span><div><b>${escapeHtml(r.task || "Task")}</b><span>${escapeHtml(r.member || "Member")} · ${escapeHtml(ago(r.at))}</span></div></li>`).join("")}</ul>`
+          : '<div class="cv-empty">Nothing approved yet.</div>'}
+        </section>
+      </div>`;
+    document.getElementById("cv-refresh").addEventListener("click", () => load(true));
+    const more = document.getElementById("cv-more");
+    if(more) more.addEventListener("click", () => { document.getElementById("cv-task-rows").innerHTML = rows(tasks); more.remove(); });
+  }
+  function rows(list){
+    return list.map(t => `<tr>
+      <td><div class="cv-task">${escapeHtml(t.title || "Task")}<small>${escapeHtml(platformName(t.platform, t.title))}${t.sector ? " · " + escapeHtml(t.sector) : ""}</small></div></td>
+      <td class="num cv-done">${num(t.completed)}</td>
+      <td class="num hide-sm">${num(t.in_review)}</td>
+      <td class="num hide-sm">${money(t.reward)}</td>
+    </tr>`).join("");
+  }
+  function bad(msg){
+    main.innerHTML = `<div class="cv-bad"><h1 id="cv-title">This link does not work</h1><p>${escapeHtml(msg)}</p></div>`;
+  }
+
+  async function load(again){
+    if(busy) return;
+    busy = true;
+    if(!again) main.innerHTML = '<div class="cv-loading"><span class="spinner"></span> Loading…</div>';
+    try{
+      const { data, error } = await supabase.rpc("get_client_view", { p_token: token });
+      if(error) throw error;
+      const d = Array.isArray(data) ? data[0] : data;
+      if(!d || !d.valid) bad("The link may be wrong, turned off or removed. Please ask Repuven for a new link.");
+      else render(d);
+    }catch(e){
+      console.warn("Client view failed", e);
+      bad("We could not load the numbers right now. Please check your internet and try again in a minute.");
+    }
+    busy = false;
+  }
+
+  function show(tok){
+    if(!view) return;
+    const clean = String(tok || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+    view.hidden = false;
+    document.documentElement.classList.add("cv-open");
+    document.title = "Client view · Repuven";
+    open = true;
+    if(clean !== token || !main.querySelector(".cv-stats, .cv-bad")){ token = clean; view.scrollTop = 0; load(false); }
+  }
+  function hide(){
+    if(!view || !open) return;
+    view.hidden = true;
+    document.documentElement.classList.remove("cv-open");
+    document.title = baseTitle;
+    open = false;
+  }
+  /** Called by the router. Returns true when the address is a client link. */
+  function handle(page, sub){
+    if(page === "client" && sub){ show(sub); return true; }
+    hide();
+    return false;
+  }
+  return { handle };
 })();
 
 /* ---------------- Module: Auth (forgot-password / set-new-password only —
