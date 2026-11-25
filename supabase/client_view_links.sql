@@ -115,8 +115,12 @@ begin
     'tasks', (select coalesce(jsonb_agg(x order by x->>'created_at' desc), '[]'::jsonb) from (
         select jsonb_build_object(
           'title', t.title,
+          'description', t.description,
+          'target_url', substring(t.target_url from '^[^?#]*'),
           'platform', lower(substring(t.target_url from '^[a-zA-Z]+://(?:www\.)?([^/:?#]+)')),
           'reward', t.reward,
+          'limited', t.budget is not null,
+          'steps', (select count(*) from regexp_split_to_table(coalesce(t.instructions, ''), E'\n') l where btrim(l) <> ''),
           'sector', ws.name,
           'created_at', t.created_at,
           'live', t.status = 'PUBLISHED' and t.removed_at is null,
@@ -127,7 +131,7 @@ begin
         left join public.work_sectors ws on ws.id = t.sector_id
         where t.status = 'PUBLISHED' and t.removed_at is null
         order by t.created_at desc
-        limit 60
+        limit 500
       ) q),
     'recent', (select coalesce(jsonb_agg(r order by r->>'at' desc), '[]'::jsonb) from (
         select jsonb_build_object(

@@ -1928,104 +1928,43 @@ const ClientView = (function(){
   };
   const svg = (k) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${ICO[k]}</svg>`;
 
-  function platformName(host, title){
-    const h = String(host || "").toLowerCase();
-    const t = String(title || "").toLowerCase();
-    if(/(^|\.)maps\.app\.goo\.gl$|goo\.gl$/.test(h) || (h.endsWith("google.com") && /map|review|place/.test(t))) return "Google Maps";
-    const map = { "google.com":"Google", "youtube.com":"YouTube", "youtu.be":"YouTube", "play.google.com":"Google Play", "apps.apple.com":"App Store",
-      "facebook.com":"Facebook", "fb.com":"Facebook", "instagram.com":"Instagram", "tiktok.com":"TikTok", "x.com":"X", "twitter.com":"X",
-      "t.me":"Telegram", "trustpilot.com":"Trustpilot", "forms.gle":"Google Forms", "docs.google.com":"Google Forms" };
-    if(map[h]) return map[h];
-    return h ? h.replace(/^m\./, "") : "Online task";
-  }
-  function ago(v){
-    const t = new Date(v).getTime(); if(!t) return "";
-    const s = Math.max(0, (Date.now() - t) / 1000);
-    if(s < 60) return "just now";
-    if(s < 3600) return Math.floor(s / 60) + " min ago";
-    if(s < 86400) return Math.floor(s / 3600) + " h ago";
-    const d = Math.floor(s / 86400);
-    return d === 1 ? "yesterday" : d + " days ago";
-  }
-  const dayLabel = d => { const m = String(d || "").match(/^(\d{4})-(\d{2})-(\d{2})/); return m ? new Date(+m[1], +m[2]-1, +m[3]).toLocaleDateString("en-US", { day:"numeric", month:"short" }) : ""; };
-
-  function stat(icon, label, value, sub, main){
-    return `<div class="cv-stat${main ? " is-main" : ""}"><div class="cv-stat-label">${svg(icon)}${label}</div><div class="cv-stat-value">${value}</div>${sub ? `<div class="cv-stat-sub">${sub}</div>` : ""}</div>`;
-  }
-
+  let allTasks = [], curSec = "";
   function render(d){
     const st = d.stats || {};
-    const daily = Array.isArray(d.daily) ? d.daily : [];
-    const tasks = Array.isArray(d.tasks) ? d.tasks : [];
-    const recent = Array.isArray(d.recent) ? d.recent : [];
-    const max = Math.max(1, ...daily.map(x => Number(x.completed || 0)));
-    const sum30 = daily.reduce((a, x) => a + Number(x.completed || 0), 0);
-    const shown = tasks.slice(0, 12);
+    allTasks = Array.isArray(d.tasks) ? d.tasks : [];
+    const secs = [...new Set(allTasks.map(t => t.sector || "Survey"))];
+    if(curSec && !secs.includes(curSec)) curSec = "";
     main.innerHTML = `
-      <section class="cv-hero">
-        <p class="cv-kicker">How we work</p>
-        <h1 id="cv-title">Real people, real work, checked by our team</h1>
-        <p>Repuven posts online tasks such as reviews, app feedback and short surveys. Members do each task and send proof. Our team checks every proof by hand, and only approved work is paid. Below you can see the live numbers.</p>
-        <div class="cv-meta">
-          ${d.label ? `<span>Prepared for <span class="cv-for">${escapeHtml(d.label)}</span></span>` : ""}
-          <span>Updated ${escapeHtml(new Date(d.generated_at || Date.now()).toLocaleString("en-US", { day:"numeric", month:"short", hour:"numeric", minute:"2-digit" }))}</span>
+      <div class="svx svx-page cv-svx">
+        <div class="svx-bar">
+          <div class="svx-tabs" id="cv-tabs">
+            ${secs.length > 1 ? `<button type="button" data-sec="" class="${curSec ? "" : "active"}">All</button>` : ""}
+            ${secs.map(s => `<button type="button" data-sec="${escapeHtml(s)}" class="${curSec === s || secs.length === 1 ? "active" : ""}">${escapeHtml(s)}</button>`).join("")}
+          </div>
           <button class="cv-btn" type="button" id="cv-refresh">${svg("refresh")}Refresh</button>
         </div>
-      </section>
-
-      <div class="cv-stats">
-        ${stat("done", "Tasks completed", num(st.completed), `${num(st.completed_7d)} in the last 7 days`, true)}
-        ${stat("tasks", "Live tasks now", num(st.live_tasks), "Open for members to do")}
-        ${stat("people", "Members who did work", num(st.workers), `${num(st.verified_members)} verified members in total`)}
-        ${stat("review", "Being checked now", num(st.in_review), "Proofs waiting for our team")}
-        ${stat("week", "Completed today", num(st.completed_today), "Bangladesh time")}
-        ${stat("paid", "Paid to members", money(st.paid_to_workers), "For approved work only")}
-      </div>
-
-      <section class="cv-card">
-        <div class="cv-card-head"><h2>Work completed, last 30 days</h2><span>${num(sum30)} approved tasks</span></div>
-        <div class="cv-chart" role="img" aria-label="Approved tasks per day for the last 30 days">
-          ${daily.map(x => { const n = Number(x.completed || 0); return `<div class="cv-bar"><i style="height:${Math.max(1, Math.round(n / max * 100))}%"></i><b>${dayLabel(x.day)}: ${num(n)}</b></div>`; }).join("")}
+        <div class="svx-sum cv-sum">
+          <div><span>Live tasks</span><b>${num(st.live_tasks)}</b></div>
+          <div><span>Tasks completed</span><b class="is-money">${num(st.completed)}</b></div>
+          <div><span>Being checked</span><b>${num(st.in_review)}</b></div>
+          <div><span>Completed today</span><b>${num(st.completed_today)}</b></div>
         </div>
-        <div class="cv-axis"><span>${dayLabel(daily[0] && daily[0].day)}</span><span>Today</span></div>
-      </section>
-
-      <section class="cv-card">
-        <div class="cv-card-head"><h2>How a task gets done</h2></div>
-        <div class="cv-steps">
-          <div class="cv-step"><h3>Task is posted</h3><p>We publish your task with clear steps and a link, so every member does it the same way.</p></div>
-          <div class="cv-step"><h3>Members do it</h3><p>Verified members open the link, do the work themselves and upload a screenshot as proof.</p></div>
-          <div class="cv-step"><h3>Our team checks</h3><p>Every proof is checked by a person. Copies, fakes and unfinished work are rejected.</p></div>
-          <div class="cv-step"><h3>Approved and paid</h3><p>Only approved work is counted and paid, so the numbers here are real, finished work.</p></div>
-        </div>
-      </section>
-
-      <div class="cv-grid2">
-        <section class="cv-card">
-          <div class="cv-card-head"><h2>Live tasks</h2><span>${num(st.live_tasks)} open</span></div>
-          ${shown.length ? `<div class="cv-tablewrap"><table class="cv-table">
-            <thead><tr><th>Task</th><th class="num">Done</th><th class="num hide-sm">Checking</th><th class="num hide-sm">Reward</th></tr></thead>
-            <tbody id="cv-task-rows">${rows(shown)}</tbody></table></div>
-            ${tasks.length > shown.length ? `<div class="cv-more"><button class="cv-btn" type="button" id="cv-more">Show all ${num(tasks.length)} tasks</button></div>` : ""}`
-          : '<div class="cv-empty">No live tasks right now.</div>'}
-        </section>
-        <section class="cv-card">
-          <div class="cv-card-head"><h2>Recently approved</h2></div>
-          ${recent.length ? `<ul class="cv-feed">${recent.map(r => `<li><span class="cv-feed-dot">${svg("done")}</span><div><b>${escapeHtml(r.task || "Task")}</b><span>${escapeHtml(r.member || "Member")} · ${escapeHtml(ago(r.at))}</span></div></li>`).join("")}</ul>`
-          : '<div class="cv-empty">Nothing approved yet.</div>'}
-        </section>
+        <div class="products-grid svx-grid" id="cv-grid"></div>
       </div>`;
+    paint();
     document.getElementById("cv-refresh").addEventListener("click", () => load(true));
-    const more = document.getElementById("cv-more");
-    if(more) more.addEventListener("click", () => { document.getElementById("cv-task-rows").innerHTML = rows(tasks); more.remove(); });
+    document.querySelectorAll("#cv-tabs [data-sec]").forEach(b => b.addEventListener("click", () => {
+      curSec = b.dataset.sec;
+      document.querySelectorAll("#cv-tabs [data-sec]").forEach(x => x.classList.toggle("active", x === b));
+      paint();
+    }));
   }
-  function rows(list){
-    return list.map(t => `<tr>
-      <td><div class="cv-task">${escapeHtml(t.title || "Task")}<small>${escapeHtml(platformName(t.platform, t.title))}${t.sector ? " · " + escapeHtml(t.sector) : ""}</small></div></td>
-      <td class="num cv-done">${num(t.completed)}</td>
-      <td class="num hide-sm">${num(t.in_review)}</td>
-      <td class="num hide-sm">${money(t.reward)}</td>
-    </tr>`).join("");
+  function paint(){
+    const grid = document.getElementById("cv-grid");
+    if(!grid) return;
+    const list = curSec ? allTasks.filter(t => (t.sector || "Survey") === curSec) : allTasks;
+    const P = Modules.products;
+    grid.innerHTML = P && P.viewListHtml ? P.viewListHtml(list) : "";
   }
   function bad(msg){
     main.innerHTML = `<div class="cv-bad"><h1 id="cv-title">This link does not work</h1><p>${escapeHtml(msg)}</p></div>`;
@@ -2055,7 +1994,7 @@ const ClientView = (function(){
     document.documentElement.classList.add("cv-open");
     document.title = "Client view · Repuven";
     open = true;
-    if(clean !== token || !main.querySelector(".cv-stats, .cv-bad")){ token = clean; view.scrollTop = 0; load(false); }
+    if(clean !== token || !main.querySelector(".cv-svx, .cv-bad")){ token = clean; view.scrollTop = 0; load(false); }
   }
   function hide(){
     if(!view || !open) return;
@@ -3799,6 +3738,67 @@ Modules.products = (function(){
     }
     return `<div class="svx-review">${ICON("i-clock")}<span>${txt}</span></div>`;
   }
+  /* Client view (#client/TOKEN): the same task cards members see, but read only.
+     No start button, no click: the right side shows how many times the task was done instead. */
+  function viewTray(t){
+    const done = Number(t.completed || 0), checking = Number(t.in_review || 0);
+    return `<span class="svx-status is-ok">${ICON("i-check")}${done.toLocaleString("en-US")} done</span>` +
+      (checking ? `<span class="svx-view-sub">${checking.toLocaleString("en-US")} being checked</span>` : "");
+  }
+  function viewCardHtml(t, i, featured){
+    if(featured){
+      const host = hostOf(safeUrl(t.target_url)), ago = agoOf(t.created_at), steps = Number(t.steps) >= 2 && Number(t.steps) <= 15 ? Number(t.steps) : 0;
+      const facts = [
+        host ? ["Where", host] : null,
+        ago ? ["Posted", ago] : null,
+        steps ? ["Steps", String(steps)] : null,
+        ["Spots", t.limited ? "Limited" : "Open"]
+      ].filter(Boolean);
+      return `<article class="svx-card is-featured is-view" style="--d:${Math.min(i, 8) * 60}ms">
+        <div class="svx-feat">
+          <div class="svx-feat-main">
+            <div class="svx-feat-top">${icoHtml(t)}<span class="svx-kicker${isNew(t) ? " is-new" : ""}">${isNew(t) ? "<i></i>New task" : "Featured task"}</span></div>
+            <h3 class="svx-title">${escapeHtml(t.title)}</h3>
+            ${t.description ? `<p class="svx-desc">${escapeHtml(t.description)}</p>` : ""}
+            <ul class="svx-facts">${facts.map(f => `<li><small>${f[0]}</small><b>${escapeHtml(f[1])}</b></li>`).join("")}</ul>
+          </div>
+          <aside class="svx-feat-side">
+            <div class="svx-earn"><span>Reward</span><b>${money(t.reward)}</b><p>Paid to the member once the proof is approved.</p></div>
+            <div class="svx-view-tray">${viewTray(t)}</div>
+          </aside>
+        </div>
+      </article>`;
+    }
+    const pills = (isNew(t) ? `<span class="svx-pill is-new">New</span>` : "") +
+      (t.limited ? `<span class="svx-pill is-limited"><i></i>Limited spots</span>` : "");
+    const host = hostOf(safeUrl(t.target_url)), ago = agoOf(t.created_at);
+    const meta = (host || ago || pills) ? `<div class="svx-meta">${pills}${host ? ICON("i-globe") + `<b>${escapeHtml(host)}</b>` : (ago ? ICON("i-clock") : "")}` +
+      `${host && ago ? '<span class="svx-dot"></span>' : ""}${ago ? `<em>${escapeHtml(ago)}</em>` : ""}</div>` : "";
+    return `<article class="svx-card is-view" style="--d:${Math.min(i, 8) * 60}ms">
+        <div class="svx-row">
+          ${icoHtml(t)}
+          <div class="svx-body">
+            ${meta}
+            <h3 class="svx-title">${escapeHtml(t.title)}</h3>
+            ${t.description ? `<p class="svx-desc">${escapeHtml(t.description)}</p>` : ""}
+          </div>
+          <div class="svx-tray">
+            <div class="svx-earn"><span>Reward</span><b>${money(t.reward)}</b></div>
+            <div class="svx-view-tray">${viewTray(t)}</div>
+          </div>
+        </div>
+      </article>`;
+  }
+  function viewListHtml(tasks){
+    if(!tasks.length) return emptyHtml("i-clipboard", "No tasks right now", "New tasks show up here as soon as they are posted.");
+    let html = viewCardHtml(tasks[0], 0, true);
+    if(tasks.length > 1){
+      html += `<div class="svx-label"><h3>More tasks</h3><span>${tasks.length - 1} open</span></div>`;
+      tasks.slice(1).forEach((t, i) => { html += viewCardHtml(t, i + 1, false); });
+    }
+    return html;
+  }
+
   function emptyHtml(icon, title, text, extra, cls){
     return `<div class="svx-empty${cls ? " " + cls : ""}"><div class="svx-empty-mark">${ICON(icon)}</div><h3>${escapeHtml(title)}</h3><p>${escapeHtml(text)}</p>${extra || ""}</div>`;
   }
@@ -4180,7 +4180,7 @@ Modules.products = (function(){
     loadTasks(user);
   }
 
-  return { init, onActivate };
+  return { init, onActivate, viewListHtml };
 })();
 
 /* ---------------- Module: Profile ---------------- */
