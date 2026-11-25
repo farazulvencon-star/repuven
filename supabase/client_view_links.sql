@@ -75,7 +75,7 @@ begin
   update public.client_view_links set removed_at = now(), is_active = false where id = p_link and removed_at is null;
 end $$;
 
--- What a client sees: the live Survey tasks, read only. No finished-work counts, member names, emails or money balances.
+-- What a client sees: the live Survey tasks, read only. No counts of finished or checked work, member names, emails or money balances.
 create or replace function public.get_client_view(p_token text)
 returns jsonb language plpgsql security definer set search_path to 'public' as $$
 declare
@@ -93,8 +93,7 @@ begin
     'label', v.label,
     'generated_at', now(),
     'stats', jsonb_build_object(
-        'live_tasks', (select count(*) from public.survey_tasks t where t.status = 'PUBLISHED' and t.removed_at is null),
-        'in_review',  (select count(*) from public.survey_submissions s where s.status = 'PENDING')
+        'live_tasks', (select count(*) from public.survey_tasks t where t.status = 'PUBLISHED' and t.removed_at is null)
       ),
     'tasks', (select coalesce(jsonb_agg(x order by x->>'created_at' desc), '[]'::jsonb) from (
         select jsonb_build_object(
@@ -105,8 +104,7 @@ begin
           'limited', t.budget is not null,
           'steps', (select count(*) from regexp_split_to_table(coalesce(t.instructions, ''), E'\n') l where btrim(l) <> ''),
           'sector', ws.name,
-          'created_at', t.created_at,
-          'in_review', (select count(*) from public.survey_submissions s where s.task_id = t.id and s.status = 'PENDING')
+          'created_at', t.created_at
         ) as x
         from public.survey_tasks t
         left join public.work_sectors ws on ws.id = t.sector_id

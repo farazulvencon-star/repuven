@@ -1946,7 +1946,7 @@ const ClientView = (function(){
         <div class="svx-sum cv-sum">
           <div><span>Live tasks</span><b>${num(st.live_tasks)}</b></div>
           <div><span>Total rewards</span><b class="is-money">${money(allTasks.reduce((a, t) => a + Number(t.reward || 0), 0))}</b></div>
-          <div><span>Being checked</span><b>${num(st.in_review)}</b></div>
+          <div><span>Top reward</span><b>${allTasks.length ? money(Math.max(...allTasks.map(t => Number(t.reward || 0)))) : "—"}</b></div>
         </div>
         <div class="products-grid svx-grid" id="cv-grid"></div>
       </div>`;
@@ -3739,10 +3739,8 @@ Modules.products = (function(){
   }
   /* Client view (#client/TOKEN): the same task cards members see, but read only.
      No start button, no click, and no count of finished work. */
-  function viewTray(t){
-    const checking = Number(t.in_review || 0);
-    return `<span class="svx-status is-pending is-live"><i></i>Live</span>` +
-      (checking ? `<span class="svx-view-sub">${checking.toLocaleString("en-US")} being checked</span>` : "");
+  function viewTray(){
+    return `<span class="svx-status is-pending is-live"><i></i>Live</span>`;
   }
   function viewCardHtml(t, i, featured){
     if(featured){
@@ -3763,7 +3761,7 @@ Modules.products = (function(){
           </div>
           <aside class="svx-feat-side">
             <div class="svx-earn"><span>Reward</span><b>${money(t.reward)}</b><p>Paid to the member once the proof is approved.</p></div>
-            <div class="svx-view-tray">${viewTray(t)}</div>
+            <div class="svx-view-tray">${viewTray()}</div>
           </aside>
         </div>
       </article>`;
@@ -3783,7 +3781,7 @@ Modules.products = (function(){
           </div>
           <div class="svx-tray">
             <div class="svx-earn"><span>Reward</span><b>${money(t.reward)}</b></div>
-            <div class="svx-view-tray">${viewTray(t)}</div>
+            <div class="svx-view-tray">${viewTray()}</div>
           </div>
         </div>
       </article>`;
