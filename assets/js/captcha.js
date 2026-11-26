@@ -75,7 +75,7 @@ window.SrvCaptcha = (function(){
     }
     return fresh();
   }
-  return { token, load, prefetch };
+  return { token, fresh, load, prefetch };
 })();
 // load Cloudflare with the page, start the check when someone taps an email or password box
 window.addEventListener("load", () => setTimeout(() => { window.SrvCaptcha.load().catch(() => {}); }, 800));

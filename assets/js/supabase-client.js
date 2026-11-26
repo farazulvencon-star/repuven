@@ -244,11 +244,22 @@
       },
       // a one-time code by email to confirm a payment (Supabase Auth email OTP)
       async sendEmailCode(email){
-        const cap = await window.SrvCaptcha.token();
-        const ob = { email, create_user: false };
-        if(cap.token) ob.gotrue_meta_security = { captcha_token: cap.token };
-        let { error } = await authRequest("/otp", { method: "POST", body: JSON.stringify(ob) });
-        if(error && cap.error && /captcha/i.test(error.message || "")) error = cap.error;
+        // Supabase needs a Cloudflare security token for this. If the first check fails or is
+        // refused, make one brand-new check and try once more before showing an error.
+        let error = null, cap = {};
+        for(let tryNo = 0; tryNo < 2; tryNo++){
+          cap = tryNo === 0 ? await window.SrvCaptcha.token() : await window.SrvCaptcha.fresh();
+          const ob = { email, create_user: false };
+          if(cap.token) ob.gotrue_meta_security = { captcha_token: cap.token };
+          ({ error } = await authRequest("/otp", { method: "POST", body: JSON.stringify(ob) }));
+          if(!error || !/captcha/i.test(error.message || "")) break;
+          console.warn("Repuven: email code security check failed", cap.code || (cap.error && cap.error.message) || error.message);
+        }
+        if(error && /captcha/i.test(error.message || "")){
+          error = { message: cap.error && cap.error.message && !/captcha/i.test(cap.error.message)
+            ? cap.error.message
+            : "The security check didn't finish, so the code wasn't sent. Tap “Send a new code”. If it keeps happening, turn off VPN or ad-blocker and refresh the page." };
+        }
         return { data: {}, error };
       },
       // Google Authenticator (Supabase MFA, TOTP)
